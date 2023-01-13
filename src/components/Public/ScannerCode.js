@@ -16,7 +16,7 @@
      TouchableOpacity
  } from 'react-native';
  
-//  import { RNCamera } from 'react-native-camera'
+ import { RNCamera } from 'react-native-camera'
  import {scaleSize,deviceWidth,deviceHeight} from '../../tools/adaptation';//适配屏幕
  
  export default class ScannerCode extends Component {
@@ -64,7 +64,7 @@
              )
              return (
                  <View style={[styles.container,this.props.style]}>
-                     {/* <RNCamera
+                     <RNCamera
                          onBarCodeRead={this.parseData.bind(this)}
                          onCameraReady={() => {
                              console.log('ready')
@@ -74,7 +74,7 @@
                          style={styles.camera}
                      >
                          {scanArea}
-                     </RNCamera> */}
+                     </RNCamera>
                  </View>
              );
          }else{

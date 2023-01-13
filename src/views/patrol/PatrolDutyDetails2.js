@@ -46,7 +46,7 @@ export default class PatrolDutyDetails2 extends Component {
 
     getPatrolDetails() {
 
-        HttpGet('qkwg-flow/flow/patrolDetailed/getDetailById', { id: this.state.id }).then((res) => {
+        HttpGet('jczl-flow/flow/patrolDetailed/getDetailById', { id: this.state.id }).then((res) => {
             if (res.flag) {
 
                 let marks = [];

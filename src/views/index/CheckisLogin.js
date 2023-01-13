@@ -25,9 +25,13 @@ export default class Checkislogin extends Component {
   }
 
   componentDidMount() {
+    console.log('---------------检测Login-------------------');
+
     global.navigation = this.props.navigation;
 
     this.getversion();
+
+    this.getStorage();
 
   }
 
@@ -71,15 +75,15 @@ export default class Checkislogin extends Component {
 
   rLogin() {
 
-    SplashScreen.hide();//关闭启动屏幕
-    toastShort('会话已过期，请您重新登录！', 'bottom');
+    // SplashScreen.hide();//关闭启动屏幕
+    // toastShort('会话已过期，请您重新登录！', 'bottom');
 
     //设置路由返回第一个界面
     global.navigation.dispatch(
       CommonActions.reset({
         index: 0,
         routes: [
-          { name: 'GMTLogin' },
+          { name: 'Login' },
         ],
       })
     );
@@ -90,7 +94,7 @@ export default class Checkislogin extends Component {
 
     console.log('----------系统当前配置信息--------------------');
 
-    HttpGet('qkwg-system/sysConfig/getSystemCurrConfig', null).then((res) => {
+    HttpGet('jczl-system/sysConfig/getSystemCurrConfig', null).then((res) => {
 
       if (res.flag) {
 
@@ -98,9 +102,11 @@ export default class Checkislogin extends Component {
           return false;
         }
 
-        let { bk, ak, ck, configKey, configValue } = res.data;
+        let { bk, ak, ck, configKey, configValue,verifyCodeSwitch } = res.data;
 
         global.rsaKey = bk;
+        global.verifyCodeSwitch=verifyCodeSwitch;
+        
         // global.rsaDecKey = operatePri;
 
         // _this.setState({
@@ -109,7 +115,7 @@ export default class Checkislogin extends Component {
         //         isForce:isForce!=undefined||isForce!=null?isForce:false,
         //     }
         // })
-        
+
         this.checkUserIsLogin();
 
         //检测到版本变化提示下载
@@ -131,12 +137,65 @@ export default class Checkislogin extends Component {
 
   }
 
+  getStorage() {
+
+    storageGet("requestHeadAuthorization").then(res => {
+      try {
+        global.requestHeadAuthorization = res.value;
+      
+      } catch (error) {
+      }
+    });
+
+    storageGet("qkwg_curUserInfo").then(res => {
+      try {
+        global.user = res.value;
+      } catch (error) {
+      }
+    });
+
+
+    storageGet("oauthToken").then(res => {
+      try {
+        global.zlt_oauthToken = res.value;
+      } catch (error) {
+      }
+    });
+
+    storageGet("zlt_curUserInfo").then(res => {
+      try {
+        global.zltUser = res.value;
+      } catch (error) {
+      }
+    });
+    
+    storageGet("zlt_OldUser").then(res => {
+      try {
+        global.zltUser.oldUser = res.value;
+      } catch (error) {
+        global.zltUser.oldUser=[]
+      }
+    });
+
+
+  }
+
   goHome() {
     this.props.navigation.navigate('HomePage', { paramsId: 2222 });
   }
 
   goLogin() {
     // this.props.navigation.navigate('Login', { paramsId: 2222 });
+
+    global.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          { name: 'Login' },
+        ],
+      })
+    );
+
   }
 
   render() {

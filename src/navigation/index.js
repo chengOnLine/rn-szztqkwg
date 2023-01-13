@@ -1,10 +1,7 @@
 import React from 'react';
-import {
-  Image, View, StyleSheet, BackHandler,
-  Button, Alert, Text, FlatList, TextInput,
-  Platform, NativeModules, StatusBar, ScrollView, TouchableOpacity, DeviceEventEmitter, PermissionsAndroid , ImageBackground
-} from 'react-native';
-import { deviceWidth, deviceHeight, scaleSize } from '../tools/adaptation';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 // import Web from '../views/index/web';//外链其他网页
 // import Checkislogin from '../views/index/CheckisLogin'; //启动页校验
 // import HomePage from '../views/index/HomePage'; //首页
@@ -72,10 +69,10 @@ const router = [
   //下面只需要配置非tabbar页面路径
 
   {
-    name: "HomePage3",
+    name: "HomePage",
     headerShown: false,
     title: "首页",
-    component: require("../views/index/HomePage3").default
+    component: require("../views/index/HomePage").default
   },
 
 
@@ -105,6 +102,13 @@ const router = [
     name: "Login",
     headerShown: false,
     title: "治理通",
+    component: require("../views/login/Index").default
+  },
+
+  {
+    name: "PwdLogin",
+    headerShown: false,
+    title: "密码登录",
     component: require("../views/login/PwdLogin").default
   },
 
@@ -121,13 +125,6 @@ const router = [
     headerShown: false,
     title: "H5登录",
     component: require("../views/index/Web").default
-  },
-
-  {
-    name: "PwdLogin",
-    headerShown: false,
-    title: "密码登录",
-    component: require("../views/login/PwdLogin").default
   },
 
   {
@@ -213,45 +210,32 @@ const router = [
     component: require("../views/patrol/MyAttendanceDetails").default
   },
 
-  // 光明通
   {
-    name: "GMTHomePage",
-    headerShown: false,
-    title: "首页",
-    component: require("../views/gmt/index/HomePage").default
+    name: "LongBanManage",
+    headerBgColor: '#FFF',
+    headerFtColor: '#000',
+    title: "楼栋长管理",
+    component: require("../views/longBan/LongBanManage").default
   },
+
   {
-    name: "GMTMine",
-    headerShown: false,
-    title: "我的",
-    component: require("../views/gmt/index/Mine").default
+    name: "LongBanEdit",
+    headerBgColor: '#FFF',
+    headerFtColor: '#000',
+    title: "楼栋长管理",
+    component: require("../views/longBan/LongBanEdit").default
   },
+
+  
   {
-    name: "GMTFingerprint",
-    headerShown: false,
-    headerBgColor: "#108bf4",
-    headerFtColor: "#FFFFFF",
-    title: "指纹设置",
-    component: require("../views/gmt/fingerprint/Setting").default
+    name: "LongBanScore",
+    headerBgColor: '#FFF',
+    headerFtColor: '#000',
+    title: "楼栋长管理",
+    component: require("../views/longBan/LongBanScore").default
   },
-  {
-    name: "GMTInspection",
-    headerShown: false,
-    title: "巡查",
-    component: require("../views/gmt/index/InspectionH5").default
-  },
-  {
-    name: "GMTToDoTask",
-    headerShown: false,
-    title: "巡查",
-    component: require("../views/gmt/index/ToDoTask").default
-  },
-  {
-    name: "GMTLogin",
-    headerShown: false,
-    title: "密码登录",
-    component: require("../views/gmt/login/Login").default
-  },
+
+
 ]
 
 export default router

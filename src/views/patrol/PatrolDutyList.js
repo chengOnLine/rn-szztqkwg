@@ -17,7 +17,7 @@ import { HttpGet, HttpPost } from '../../request/index'
 import SvgUri from 'react-native-svg-uri';
 import { Icons } from '../../fonts/fontIcons'
 import { toastShort } from '../../tools/toastUtil';
-Picker = {} // picker有问题 不用
+
 let self;
 export default class PatrolDutyList extends Component {
     constructor(props) {
@@ -67,7 +67,7 @@ export default class PatrolDutyList extends Component {
 
     componentWillUnmount() {
 
-        Picker.hide();
+        // Picker.hide();
     }
 
     onBackAndroid = () => {
@@ -113,9 +113,9 @@ export default class PatrolDutyList extends Component {
             this.state.offset = 1;
         }
 
-        let postUrl = 'qkwg-flow/flow/patrolEvent/APPEventFindPage'
+        let postUrl = 'jczl-flow/flow/patrolEvent/APPEventFindPage'
         if (this.state.activeId == 2) {
-            postUrl = 'qkwg-flow/flow/patrolEvent/APPEventEndFindPage'
+            postUrl = 'jczl-flow/flow/patrolEvent/APPEventEndFindPage'
         }
 
         let params = {
@@ -243,22 +243,22 @@ export default class PatrolDutyList extends Component {
 
         let searchDay = this.state.searchDay.split('-');
 
-        Picker.init({
-            pickerData: data,
-            selectedValue: [searchDay[0], searchDay[1]],
-            pickerTitleText: '巡查时间',
-            pickerConfirmBtnText: '确定',
-            pickerCancelBtnText: '取消',
-            pickerTextEllipsisLen: 12,
-            pickerBg: [255, 255, 255, 1],
-            onPickerConfirm: data => {
-                this.setState({ searchDay: data[0] + '-' + data[1] });
-            },
-            onPickerCancel: data => {
-                Picker.hide();
-            },
-        });
-        Picker.show();
+        // Picker.init({
+        //     pickerData: data,
+        //     selectedValue: [searchDay[0], searchDay[1]],
+        //     pickerTitleText: '巡查时间',
+        //     pickerConfirmBtnText: '确定',
+        //     pickerCancelBtnText: '取消',
+        //     pickerTextEllipsisLen: 12,
+        //     pickerBg: [255, 255, 255, 1],
+        //     onPickerConfirm: data => {
+        //         this.setState({ searchDay: data[0] + '-' + data[1] });
+        //     },
+        //     onPickerCancel: data => {
+        //         Picker.hide();
+        //     },
+        // });
+        // Picker.show();
 
     }
 

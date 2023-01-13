@@ -15,16 +15,19 @@ import {
     Button
 } from 'react-native';
 import Head from '../../components/Public/Head';
+import { storageSet, storageGet } from '../../storage/index'
 
 import { WebView } from 'react-native-webview';
-// import DeviceInfo from 'react-native-device-info';
+import DeviceInfo from 'react-native-device-info';
 import ScannerCode from '../../components/Public/ScannerCode'; //扫描二维码
 import SYImagePicker from 'react-native-syan-image-picker'
 
 import { deviceHeight, deviceWidth, scaleSize } from "../../tools/adaptation";
-import { toastShort } from "../../tools/ToastUtil";
-import { HttpPost } from '../../tools/request';
-import { getLocation, getLocation2 , getLocationInfo} from "../../tools/AmapLocation";
+import { toastShort } from "../../tools/toastUtil";
+import { getLocation, getLocation2, getNowLocation } from "../../tools/AmapLocation";
+import { post } from "../../request/NetUtility";
+import { HttpGet, HttpPost } from '../../request/index'
+import { decryptKeyVal } from '../../tools/comm'
 
 const patchPostMessageJsCode = `(function() {
     window.postMessage = function(data) {
@@ -43,10 +46,14 @@ export default class Web extends Component {
         this.state = {
             outCode: this.props.route.params.outCode,
             h5Url: this.props.route.params.h5Url,
+            isOldPage: this.props.route.params.isOldPage,
 
             visiteUrl: '',
             backButtonEnabled: false,
-            scanShow: false
+            scanShow: false,
+
+            navStateUrl: '',
+            isBack: false,
 
             // show:true,
             // animation: new Animated.Value(0),
@@ -58,36 +65,21 @@ export default class Web extends Component {
         if (Platform.OS === 'android') {
             BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
         }
+        if (self.state.isOldPage) {
+            // this.getCasParams()
+            this.getZLTtoken();
+        } else {
+            // alert(self.state.h5Url)
+
+            this.setState({
+                visiteUrl: self.state.h5Url
+            })
+        }
+
+        toastShort("正在加载中...", 'center');
 
         // InteractionManager.runAfterInteractions(()=>{
         //     this.startAnimation()
-        // });
-
-        //登录获取token
-        // let params = { userId: global.user.info.id, outCode: this.props.navigation.getParam('outCode', '') }
-
-        // HttpPost('/appLogin/getCasParam', params, function (res) {
-        //     if (res.hasOwnProperty("code") && res.code == '1') {
-        //         toastShort(res.msg, 'bottom');
-        //         n.navigate('login');
-        //         return false;
-        //     }
-
-        //     if (res.flag) {
-        //         let data = res.data;
-
-        //         self.setState({
-        //             visiteUrl: self.state.h5Url + (self.state.h5Url.indexOf('?') >= 0 ? '&' : '?') + 'token=' + encodeURIComponent(data)
-        //         })
-        //         console.log('h5-url: ' + self.state.visiteUrl)
-        //     } else {
-        //         toastShort(res.msg, 'bottom');
-        //     }
-        // }, self).then(() => {
-        //     // console.log('成功');
-        // }).catch((error) => {
-        //     // console.log(error);
-        //     toastShort(error, 'bottom');//超时会在这里
         // });
     }
 
@@ -100,37 +92,43 @@ export default class Web extends Component {
     }
 
     onBackAndroid = () => {
+
+        if (global.routeName != 'HomePage' && global.routeName != 'TabIndex') {
+            this.setState({ isBack: true })
+        }
+
         if (this.state.backButtonEnabled) {
             this.refs['webView'].goBack();
             return true;
         } else {
-            DeviceEventEmitter.emit('backHome');
-            n.goBack();
+            // DeviceEventEmitter.emit('backHome');
+            // n.goBack();
             return true;
         }
     };
 
-    handleMessage = async (evt: any) => {
+    handleMessage = (evt) => {
         try {
             const message = evt.nativeEvent.data
-            console.log("message" ,message);
-            // alert(JSON.stringify(message))
+            console.log(message);
 
-            // debugger
             let jsonObj = JSON.parse(message);
             let resultObj = {};
             if (jsonObj.action == 'getLocation') {//定位功能
-                getLocationInfo().then((res) => {
-                    const { code , data = {} , error } = res;
+
+                getLocation().then((res) => {
+
+                    const { code, data = {}, error } = res;
                     if (code == 0) {
-                        const { address , coords = {} } = data;
-                        this.postMessageToH5(jsonObj, { code: 0 , address , ...coords });
+                        const { address, coords = {} } = data;
+                        this.postMessageToH5(jsonObj, { code: 0, address, ...coords });
                     } else {
-                        this.postMessageToH5(jsonObj, { code: 1 , error });
+                        this.postMessageToH5(jsonObj, { code: 1, error });
                     }
                 }).catch((error) => {
-                    this.postMessageToH5(jsonObj, { code: 1 , error });
-                })   
+                    this.postMessageToH5(jsonObj, { code: 1, error });
+                })
+
             } else if (jsonObj.action == 'getScan') {//扫码
                 self.setState({
                     scanShow: true
@@ -146,7 +144,7 @@ export default class Web extends Component {
                         console.log(photos);
                         const image = photos.map(v => {
                             return {
-                                data: v.base64,
+                                data: v.base64.replace('data:image/jpeg;base64,', '').replace('data:image/png;base64,', ''),
                                 path: v.uri,
                             }
                         });
@@ -178,7 +176,7 @@ export default class Web extends Component {
 
                         const image = photos.map(v => {
                             return {
-                                data: v.base64,
+                                data: v.base64.replace('data:image/jpeg;base64,', '').replace('data:image/png;base64,', ''),
                                 path: v.uri,
                             }
                         });
@@ -198,14 +196,13 @@ export default class Web extends Component {
                     }
                 })
             } else if (jsonObj.action == 'getSystemInfo') {//系统信息
-                debugger
-                // let brand = DeviceInfo.getBrand();
-                // let uniqueID = DeviceInfo.getUniqueID();
+                let brand = DeviceInfo.getBrand();
+                let uniqueID = DeviceInfo.getUniqueID();
                 let os = Platform.OS;
-                // let systemVersion = DeviceInfo.getSystemVersion();
+                let systemVersion = DeviceInfo.getSystemVersion();
 
                 resultObj = {
-                    os
+                    brand, uniqueID, os, systemVersion
                 }
 
                 self.postMessageToH5(jsonObj, resultObj);
@@ -214,6 +211,12 @@ export default class Web extends Component {
                 resultObj = { token }
 
                 self.postMessageToH5(jsonObj, resultObj);
+            } else if (jsonObj.action == 'getZltToken') {//获取治理通内部登录Token
+                let token = global.zlt_oauthToken;
+                resultObj = { token }
+
+                self.postMessageToH5(jsonObj, resultObj);
+
             } else if (jsonObj.action == 'getVersion') {//获取内部登录Token
                 let curVerNumber = global.version.curNumber;
                 resultObj = { curVerNumber }
@@ -222,7 +225,7 @@ export default class Web extends Component {
             } else if (jsonObj.action == 'navToPage') {//跳转RN界面
                 let nvoTo = jsonObj.params.page;
 
-                if (nvoTo == 'HomePage2') {
+                if (nvoTo.toLowerCase().indexOf('homepage') >= 0) {
                     DeviceEventEmitter.emit('backHome');
                     n.navigate("TabIndex");
 
@@ -235,6 +238,12 @@ export default class Web extends Component {
             } else if (jsonObj.action == "setTitle") {
                 global.H5Title = jsonObj.params.title;
                 DeviceEventEmitter.emit('updateTitle');
+            } else if (jsonObj.action == 'getUserInfo') { //获取治理通的基本用户信息
+
+                let userInfo = global.zltUser.info;
+                resultObj = { userInfo }
+
+                self.postMessageToH5(jsonObj, resultObj);
             }
         } catch (error) {
         }
@@ -249,6 +258,163 @@ export default class Web extends Component {
         // });
     }
 
+
+    //获取治理通的登录token
+    getZLTtoken() {
+
+        HttpGet('qkwg-system/system/user/getToken/' + global.zltUser.userName, null).then((res) => {
+            if (res.flag) {
+                let data = res.data;
+
+                console.log('getZLTtoken', data);
+
+                global.zlt_oauthToken = "Bearer " + data;
+                storageSet('oauthToken', global.zlt_oauthToken);
+
+                this.getZLTUserInfo();
+
+            } else {
+                global.zlt_oauthToken = "";
+                toastShort("该用户没有权限登录", 'bottom');
+                n.goBack();
+            }
+        }).catch((error) => {
+            toastShort(error, 'bottom');//超时会在这里
+            n.goBack();
+        })
+    }
+
+    getZLTUserInfo() {
+        let self = this;
+
+        let postLogin = {
+            param3: global.zltVersion.curNumber,
+            param4: "",
+            lat: '',
+            lng: '',
+            currentRole: '',
+        };
+
+        post(global.zlt_requestApi + '/zty-system/sys/sysuser/loginOperate', postLogin, null, function (res) {
+
+            if (res.hasOwnProperty("flag")) {
+                if (res.flag) {
+                    let { mainKey, user } = res.data;
+
+                    // res.data.appRoleList=decryptKeyVal(appRoleList,mainKey);
+                    res.data.user = decryptKeyVal(user, mainKey);
+                    // console.log(res);
+
+                    let { communityId, communityName, deptId, deptName, email, fullName, gridId, gridName,
+                        identity, password, phone, picAddress, princeArea, roleId, roleKey, roleName, sex,
+                        streetId, userId, cardId, appRoleList } = JSON.parse(res.data.user);
+
+                    // let {token,userUid} = res.data.sesMap;
+                    // console.log('appLogin result',global.user.info);
+                    global.zltUser.info = {
+                        //id,userName,password,identity,departmentId,sex,email,phone
+                        id: userId,
+                        userName: fullName,
+                        password,
+                        identity,
+                        departmentId: deptId == undefined ? 0 : deptId,
+                        sex,
+                        phone,
+                        email,
+                        communityId,
+                        communityName,
+                        deptName,
+                        gridId,
+                        gridName,
+                        picAddress,
+                        princeArea,
+                        roleId,
+                        roleKey,
+                        roleName,
+                        streetId,
+                        cardId
+                    };
+
+                    global.user.appRoleList = JSON.parse(appRoleList);
+
+                    storageSet('zlt_curUserInfo', global.zltUser);
+                    console.log('zlt_curUserInfo:' + JSON.stringify(global.zltUser.info))
+
+                    self.getCasParams();
+
+                } else {
+                    //   toastShort(res.msg, 'bottom');
+                    toastShort("该用户没有权限登录", 'bottom');
+                    n.goBack();
+                }
+            } else {
+
+                toastShort("该用户没有权限登录", 'bottom');
+                n.goBack();
+            }
+        })
+    }
+
+    //老版本H5登录token
+    // getCasParams() {
+    //     HttpGet('qkwg-system/system/user/getToken', null).then((res) => {
+
+    //         if (res.flag) {
+    //             let data = res.data;
+    //             self.setState({
+    //                 visiteUrl: self.state.h5Url + (self.state.h5Url.indexOf('?') >= 0 ? '&' : '?') + 'token=' + encodeURIComponent(data)
+    //             })
+    //             console.log('h5-url: ' + self.state.visiteUrl)
+    //         } else {
+    //             toastShort(res.msg, 'bottom');
+    //         }
+    //     }).catch((error) => {
+    //         toastShort(error, 'bottom');//超时会在这里
+    //     })
+    // }
+
+    //老版本H5登录token
+    getCasParams() {
+        let self = this;
+        if (global.zlt_oauthToken == "") {
+            toastShort("该用户没有权限登录", 'bottom');
+            n.goBack();
+            return;
+        }
+
+        if (this.outCode == "zlth5") {
+            self.setState({
+                visiteUrl: self.state.h5Url
+            })
+        } else {
+
+            post(global.zlt_requestApi + '/zty-system/appLogin/getCasParam',
+                { userId: global.zltUser.info.id, outCode: this.state.outCode }, null,
+                function (res) {
+
+                    if (res.flag) {
+                        let data = res.data;
+
+                        self.setState({
+                            visiteUrl: self.state.h5Url + (self.state.h5Url.indexOf('?') >= 0 ? '&' : '?') + 'token=' + encodeURIComponent(data)
+                        })
+
+                        console.log('h5-url: ' + self.state.visiteUrl)
+                    } else { 
+                        toastShort("该用户没有权限登录", 'bottom');
+                        n.goBack();
+                    }
+                }, self).then(() => {
+                    // console.log('成功');
+                }).catch((error) => {
+                    // console.log(error);
+                    // toastShort(error, 'bottom');//超时会在这里
+                    toastShort("该用户没有权限登录", 'bottom');
+                    n.goBack();
+                });
+        }
+    }
+
     postMessageToH5(jsonObj, resultObj) {
         // if(jsonObj.backApply){
         let backObject = {
@@ -261,9 +427,25 @@ export default class Web extends Component {
     }
 
     onNavigationStateChange = navState => {
-        this.setState({
-            backButtonEnabled: navState.canGoBack
-        });
+
+        if (this.state.isBack) {
+            // console.log('----navStateUrl11----',navState.url)
+            //防止返回空白页，再次跳转
+            if (navState.url.indexOf("about:blank") >= 0) {
+
+                DeviceEventEmitter.emit('backHome');
+                DeviceEventEmitter.emit('backMyIndex');
+                n.goBack();
+                this.setState({ isBack: false })
+            }
+            return true;
+        } else {
+
+            this.setState({
+                backButtonEnabled: navState.canGoBack,
+                navStateUrl: navState.url
+            });
+        }
     };
 
     // 扫描二维码开启关闭
@@ -331,7 +513,7 @@ export default class Web extends Component {
                 <WebView
                     ref='webView'
                     // source={{ uri: 'file:///android_asset/test.html' }}
-                    source={{ uri: this.state.h5Url }}
+                    source={{ uri: this.state.visiteUrl }}
                     scalesPageToFit={true}
                     startInLoadingState={true}
                     javaScriptEnabled={true}//指定WebView中是否启用JavaScript

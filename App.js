@@ -45,11 +45,11 @@ LocaleConfig.defaultLocale = 'fr';
 
 const App = () => {
   return (
-    // <RootSiblingParent>
+    <RootSiblingParent>
       <NavigationContainer>
         <StackNavigator />
       </NavigationContainer>
-    // </RootSiblingParent>
+    </RootSiblingParent>
   );
 }
 

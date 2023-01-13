@@ -45,7 +45,7 @@ const StackNavigator = () => {
                                 // headerBackTitle:'G0',
 
                                 headerShown: item.headerShown == undefined ? true : item.headerShown, //不显示头部标题
-                                ...item
+
                                 // headerRight: () => (
                                 //     <Button
                                 //         onPress={() => alert('This is a button!')}

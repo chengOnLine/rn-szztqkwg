@@ -40,7 +40,7 @@ export default class Index extends Component {
     self = this.props;
     return (
       <View style={styles.container}>
-      <Head back={false} title='基层治理' />
+      <Head back={false} title='治理通' />
     
         <View style={styles.mainView}>
           <TouchableOpacity style={styles.btn} activeOpacity={0.8}>

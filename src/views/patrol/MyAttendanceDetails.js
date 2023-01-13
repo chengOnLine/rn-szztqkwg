@@ -37,7 +37,7 @@ export default class MyAttendanceDetails extends Component {
 
     getDetails() {
         //获取当前最新考勤记录，是否在签到中
-        HttpGet('qkwg-system/system/assess/dept/listAssessIndex/' + this.state.id, null).then((res) => {
+        HttpGet('jczl-system/system/assess/dept/listAssessIndex/' + this.state.id, null).then((res) => {
             if (res.flag) {
                 this.setState({
                     data: res.data

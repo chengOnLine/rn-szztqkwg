@@ -44,8 +44,8 @@ export default class PatrolDailyDetails extends Component {
 
     toastShort('正在打开巡逻界面，请稍等...', 'bottom');
 
-    //获取当前最新考勤记录，是否在签到中
-    HttpGet('qkwg-flow/flow/userGis/getTrackList/' + siginId, null).then((res) => {
+    //获取历史轨迹数据
+    HttpGet('qkwg-jcwg/flow/userGis/getTrackList/' + siginId, null).then((res) => {
       if (res.flag) {
 
         if (res.data.length == 0) {
@@ -94,7 +94,7 @@ export default class PatrolDailyDetails extends Component {
           </View>
 
           <View style={styles.listItem}>
-            <Text style={[styles.qdstate, { backgroundColor: '#ffa200' }]}>签退</Text><Text style={styles.txt03}>{item.singOutTime}</Text>
+            <Text style={[styles.qdstate, { backgroundColor: '#ffa200' }]}>签退</Text><Text style={styles.txt03}>{item.signOutTime}</Text>
           </View>
 
           <View style={[styles.listItem, styles.addrbtm]}>
@@ -109,10 +109,10 @@ export default class PatrolDailyDetails extends Component {
             <Text>是否有效：</Text><Text>{item.isEffective == 1 ? '有效' : '无效'}</Text>
           </View>
 
-          {/* <View style={styles.listItem}>
+          <View style={styles.listItem}>
             <View><Text>备注：</Text></View>
-            <View style={{ flex: 1, }}><Text>广东省深圳市光明区同观大道9号靠证通电子产业园广东省深圳市光明区同观大道9号靠证通电子产业园</Text></View>
-          </View> */}
+            <View style={{ flex: 1, }}><Text>{item.describe}</Text></View>
+          </View>
         </View>
 
         <TouchableOpacity
@@ -133,7 +133,7 @@ export default class PatrolDailyDetails extends Component {
 
     this.setState({ data: [] })
 
-    HttpGet('qkwg-flow/flow/dailyAttendance/getOwnDailyAttendanceByDate/' + this.state.date, null).then((res) => {
+    HttpGet('qkwg-jcwg/flow/dailyAttendance/getOwnDailyAttendanceByDate/' + this.state.date, null).then((res) => {
       if (res.flag) {
         let resdata = res.data;
 

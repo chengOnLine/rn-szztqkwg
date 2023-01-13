@@ -8,7 +8,7 @@ import {
     DeviceEventEmitter,
     Platform,
 } from 'react-native';
-// import BiometricPopup from '../../components/Index/BiometricPopup'
+import BiometricPopup from '../../components/Index/BiometricPopup'
 import { deviceWidth, deviceHeight, scaleSize } from '../../tools/adaptation';
 import { storageGet, storageSet } from '../../storage/index'
 import { CommonActions } from '@react-navigation/native';
@@ -31,7 +31,7 @@ export default class FingerSettings extends Component {
                 //指纹认证成功
                 global.user.info.FingerSettings = true;
 
-                storageSet('curUserInfo', global.user);
+                storageSet('qkwg_curUserInfo', global.user);
                 // n.navigate('HomePage');
                 //跳转首页
                 this.cancelSettings();
@@ -81,7 +81,7 @@ export default class FingerSettings extends Component {
                     barStyle={'dark-content'} // 字体样式 enum('default', 'light-content', 'dark-content')  
                 /> */}
 
-                {/* <View style={styles.retGo}>
+                <View style={styles.retGo}>
                     <TouchableOpacity
                         onPress={() => {
                             this.cancelSettings();
@@ -110,7 +110,7 @@ export default class FingerSettings extends Component {
                     </TouchableOpacity>
                 </View>
 
-                {this.state.isHandCode ? <BiometricPopup onAuthenticate={this.onBiometricPopup}></BiometricPopup> : null} */}
+                {this.state.isHandCode ? <BiometricPopup onAuthenticate={this.onBiometricPopup}></BiometricPopup> : null}
             </View>
         );
     }

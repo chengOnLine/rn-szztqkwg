@@ -34,7 +34,7 @@ export default class L_Input extends Component {
             imageUrl = require('../../assets/login_icon1.png');
         } else if (p.type == 'pwd') {
             imageUrl = require('../../assets/login_icon2.png');
-        }else if(p.type =='tel'){
+        } else if (p.type == 'tel') {
             imageUrl = require('../../assets/login_icon4.png');
         } else {
             imageUrl = require('../../assets/login_icon3.png');
@@ -65,13 +65,12 @@ export default class L_Input extends Component {
                 </TouchableOpacity>
 
                 {
-
                     p.type === 'user' || p.type == 'tel' || p.type == 'code' ?
                         <TextInput
                             placeholder={p.placeholder}
                             maxLength={p.maxLength}
                             keyboardType={p.keyboardType}
-                            
+
                             style={styles.textInput}
                             value={this.state.value}
                             underlineColorAndroid='transparent' //设置下划线背景色透明 达到去掉下划线的效果
@@ -89,9 +88,21 @@ export default class L_Input extends Component {
                 }
 
                 {
-                    p.type == 'code' ? <View style={styles.codeText}>
-                        <Text style={{ marginLeft: scaleSize(20), color: '#2589FF' }}>获取验证码</Text>
-                    </View> : null
+                    p.type == 'pwd' ?
+                        <TouchableOpacity
+                            activeOpacity={0.9}
+                            onPress={() => {
+                                this.setState({ secureTextEntry: !this.state.secureTextEntry })
+                            }}
+                        >
+                            <Image source={require('../../assets/showPwd.png')}
+                                style={{
+                                    height: scaleSize(30),
+                                    width: scaleSize(35),
+                                    margin: 10,
+                                }} />
+                        </TouchableOpacity>
+                        : null
                 }
 
                 {/* <Image source={
@@ -107,14 +118,15 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         width: deviceWidth - scaleSize(110),
-        marginLeft: scaleSize(50),
-        marginRight: scaleSize(50),
-        height: scaleSize(90),
+        marginLeft: scaleSize(20),
+        // marginRight: scaleSize(50),
+        height: scaleSize(100),
         borderWidth: scaleSize(1),
-        borderRadius: scaleSize(125),
-        borderColor: '#F4F4F4',
+        // borderRadius: scaleSize(125),
+        borderColor: '#fff',
+        borderBottomColor: '#D3E6FF',
         alignItems: 'center',
-        backgroundColor: '#F4F4F4',
+        // backgroundColor: '#F4F4F4',
         marginBottom: scaleSize(30)
 
     },
@@ -124,14 +136,7 @@ const styles = StyleSheet.create({
         marginBottom: scaleSize(5),
         padding: scaleSize(0.5),
         color: '#666',
-        backgroundColor: '#F4F4F4'
+        // backgroundColor: '#F4F4F4'
     },
-
-    codeText: {
-        position: 'absolute',
-        right: 25,
-        borderLeftColor: '#ccc',
-        borderLeftWidth: 1
-    }
 
 });

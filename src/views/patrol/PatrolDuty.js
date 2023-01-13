@@ -17,7 +17,7 @@ import { HttpGet, HttpPost } from '../../request/index'
 import SvgUri from 'react-native-svg-uri';
 import { Icons } from '../../fonts/fontIcons'
 import { toastShort } from '../../tools/toastUtil';
-Picker = {} // picker有问题 不用
+
 let self;
 let curDay = '';
 
@@ -66,7 +66,7 @@ export default class PatrolDuty extends Component {
 
   componentWillUnmount() {
 
-    Picker.hide();
+    // Picker.hide();
     
   }
 
@@ -117,7 +117,7 @@ export default class PatrolDuty extends Component {
       pageSize: 10,
     }
 
-    HttpPost('qkwg-flow/flow/partolTask/APPfindPage', params, 'json').then(res => {
+    HttpPost('jczl-flow/flow/partolTask/APPfindPage', params, 'json').then(res => {
       if (res.flag) {
 
         let resdata = res.data.rows;
@@ -222,24 +222,24 @@ export default class PatrolDuty extends Component {
 
     let searchDay = this.state.searchDay.split('-');
 
-    Picker.init({
-      pickerData: data,
-      selectedValue: [searchDay[0], searchDay[1]],
-      pickerTitleText: '巡查时间',
-      pickerConfirmBtnText: '确定',
-      pickerCancelBtnText: '取消',
-      pickerTextEllipsisLen: 12,
-      pickerBg: [255, 255, 255, 1],
-      onPickerConfirm: data => {
-        this.setState({ searchDay: data[0] + '-' + data[1] });
-        this._getList('');
-      },
-      onPickerCancel: data => {
+    // Picker.init({
+    //   pickerData: data,
+    //   selectedValue: [searchDay[0], searchDay[1]],
+    //   pickerTitleText: '巡查时间',
+    //   pickerConfirmBtnText: '确定',
+    //   pickerCancelBtnText: '取消',
+    //   pickerTextEllipsisLen: 12,
+    //   pickerBg: [255, 255, 255, 1],
+    //   onPickerConfirm: data => {
+    //     this.setState({ searchDay: data[0] + '-' + data[1] });
+    //     this._getList('');
+    //   },
+    //   onPickerCancel: data => {
 
-        Picker.hide();
-      },
-    });
-    Picker.show();
+    //     Picker.hide();
+    //   },
+    // });
+    // Picker.show();
 
   }
 

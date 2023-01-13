@@ -42,16 +42,15 @@ export default class UpdateVersion extends Component {
     }
 
     getVersionInfo() {
-        let params = { name: '基层治理' }
-        HttpPost('qkwg-system/edition/findPage', params, 'json').then(res => {
+
+        HttpGet('qkwg-system/edition/find/currUserUpdatePackage', null).then(res => {
             if (res.flag) {
-                let rows = res.data.rows;
-                if (rows.length > 0) {
-                    let verdata = res.data.rows[0];
+                try {
+
+                    let verdata = res.data
 
                     let versionNumber = verdata.versionNumber
                     let prompt = verdata.prompt
-
                     let type = verdata.type == 0 ? true : false //类型 0-强制更新 1-提示升级
                     let updateUrl = verdata.fileinfo[0].url
 
@@ -63,7 +62,8 @@ export default class UpdateVersion extends Component {
                             marke: prompt
                         })
                     }
-                }
+
+                } catch (error) { }
             }
         })
     }
@@ -121,7 +121,7 @@ export default class UpdateVersion extends Component {
                     title={'版本更新'}
                     btnTxt={'现在更新'}
                     cancelTxt={'暂不更新'}
-                    isOkShow={true} 
+                    isOkShow={true}
                     isCancelShow={this.state.isForce ? false : true}
                     style={{
                         width: '90%',

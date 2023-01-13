@@ -3,6 +3,7 @@
  */
 import React, { Component } from 'react';
 import { getUUID } from "../tools/comm";
+import {toastShort} from "../tools/toastUtil";
 
 const delay = timeout => {
     return new Promise((resolve, reject) => {
@@ -40,7 +41,7 @@ const get = (url, params, callback) => {
             headers: {
                 // "X-Requested-With": "XMLHttpRequest",
                 // // 'token':global.user.token,
-                Authorization: global.oauthToken.access_token ? (global.oauthToken.token_type + ' ' + global.oauthToken.access_token) : '',
+                Authorization: global.zlt_oauthToken,
                 // 'onceKey': getUUID(),
                 'uid': global.user.info.id,
             },
@@ -50,10 +51,9 @@ const get = (url, params, callback) => {
             return response.json();
         }).then((response) => {
 
-            console.log("token: " + global.oauthToken.access_token);
-            console.log("请求接口：" + url);
-            console.log("请求参数：" + JSON.stringify(params))
-            console.log("返回结果：" + JSON.stringify(response));
+            // console.log("请求接口：" + url);
+            // console.log("请求参数：" + JSON.stringify(params))
+            // console.log("返回结果：" + JSON.stringify(response));
 
             resolve();
             exitApp();
@@ -109,9 +109,9 @@ const post = (url, params, headers, callback) => {
                     responseJSON.code = '-1';
                 // toastShort('请求接口: ' + url.replace(global.requestApi, '') + '返回：' + responseJSON.code, 'center');
 
-                console.log("token: " + global.oauthToken.access_token);
+                // console.log("token:" + global.zlt_oauthToken);
                 console.log("请求接口：" + url);
-                console.log("请求参数：" + JSON.stringify(params))
+                // console.log("请求参数：" + JSON.stringify(params))
                 console.log("返回结果：" + JSON.stringify(responseJSON));
 
                 callback(responseJSON);

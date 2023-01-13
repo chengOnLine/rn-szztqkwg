@@ -29,12 +29,12 @@ const scale = Math.min(deviceHeight / h2, deviceWidth / w2); //获取缩放比�
  * @param size sp
  * return number dp
  */
-export function setSpText(size: number) {
+export function setSpText(size) {
   size = Math.round(((size * scale + 0.5) * pixelRatio) / fontScale);
   return size / defaultPixel;
 }
 
-export function scaleSize(size: number) {
+export function scaleSize(size) {
   size = Math.round(size * scale + 0.5);
   return size / defaultPixel;
 }

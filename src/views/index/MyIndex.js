@@ -11,6 +11,7 @@ import {
   DeviceEventEmitter
 } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
+import { toastShort } from '../../tools/toastUtil';
 
 import SvgUri from 'react-native-svg-uri';
 import { deviceWidth, deviceHeight, scaleSize } from '../../tools/adaptation';
@@ -55,7 +56,7 @@ export default class MyIndex extends Component {
 
   getPersonalInfo() {
 
-    HttpGet('qkwg-system/system/user/personalCenter', null).then((res) => {
+    HttpGet('jczl-system/system/user/personalCenter', null).then((res) => {
 
       if (res.flag) {
 
@@ -126,7 +127,7 @@ export default class MyIndex extends Component {
           text: '确定',
           onPress: () => {
 
-            HttpGet('qkwg-oauth-server/auth/loginOut/0', null).then((res) => {
+            HttpGet('jczl-oauth-server/auth/loginOut/0', null).then((res) => {
               if (res.flag) {
 
                 //设置路由返回第一个界面

@@ -54,7 +54,7 @@ export default class NewsIndex extends Component {
         var regex = /(<([^>]+)>)/ig
 
         let params = { pageNumber: 1, pageSize: 10, status: 0 }
-        HttpPost('qkwg-system/column/findPage', params, 'json').then(res => {
+        HttpPost('jczl-system/column/findPage', params, 'json').then(res => {
             if (res.flag) {
                 let tabList = [];
                 if (res.data.rows.length > 0) {
@@ -150,7 +150,7 @@ export default class NewsIndex extends Component {
             status: 1
         }
 
-        HttpPost('qkwg-system/article/findPage', params, 'json').then(res => {
+        HttpPost('jczl-system/article/findPage', params, 'json').then(res => {
             if (res.flag) {
 
                 let resdata = res.data.rows;

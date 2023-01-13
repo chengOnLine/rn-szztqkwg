@@ -84,6 +84,28 @@ export function Encrypt(word) {
     return encrypted.ciphertext.toString().toUpperCase();
 }
 
+
+
+  //aes加密
+  export function aesEn(word, key) {
+    let keys = CryptoJS.enc.Utf8.parse(key)
+    var srcs = CryptoJS.enc.Utf8.parse(word)
+    var encrypted = CryptoJS.AES.encrypt(srcs, keys, {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7
+    })
+    return encrypted.toString()
+  }
+  //aes解密
+  export function aesDe(word, key) {
+    let keys = CryptoJS.enc.Utf8.parse(key)
+    var decrypt = CryptoJS.AES.decrypt(word, keys, {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7
+    })
+    return CryptoJS.enc.Utf8.stringify(decrypt).toString()
+  }
+
 /**
  * 手机号码
  * 参数

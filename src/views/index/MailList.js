@@ -7,6 +7,7 @@ import Head from '../../components/Public/Head';
 import Bottom from '../../components/Public/TabBottom';
 import CommonStyles from '../../styles/index'
 import { HttpGet, HttpPost } from '../../request/index'
+import { toastShort } from '../../tools/toastUtil';
 
 let self;
 let total = 0, pageSize = 15;
@@ -42,7 +43,7 @@ export default class MailList extends Component {
 
   _getAddressBook = () => {
 
-    HttpGet('qkwg-system/system/user/getContactBook', null).then(res => {
+    HttpGet('jczl-system/system/user/getContactBook', null).then(res => {
 
       if (res.flag) {
 

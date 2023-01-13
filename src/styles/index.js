@@ -6,24 +6,6 @@ import {
 import { scaleSize, deviceHeight } from '../tools/adaptation';//适配屏幕
 
 const styCom = StyleSheet.create({
-
-    /*Flex*/
-    Flex: {display: 'flex' , flexDirection: 'row' },
-    Column: {flexDirection: 'column'},
-    FlexWrap: {display: 'flex', flexWrap: 'wrap' , flexDirection: 'row' },
-    Flex1: {flex: 1,},
-    FlexCenter: {display: 'flex',justifyContent: 'center' , flexDirection: 'row' },
-    FlexCenterCenter: {display: 'flex',justifyContent: 'center',alignItems: 'center', flexDirection: 'row' },
-    FlexBetween: {display: 'flex',justifyContent: 'space-between', flexDirection: 'row' },
-    FlexBetweenCenter: {display: 'flex',justifyConternt: 'space-between',alignItems: 'center', flexDirection: 'row' },
-    FlexAround: {display: 'flex',justifyContent: 'space-around', flexDirection: 'row' },
-    FlexAroundCenter: {display: 'flex',justifyContent: 'space-around',alignItems: 'center', flexDirection: 'row' },
-    FlexStartCenter: {display: 'flex',alignItems: 'center', flexDirection: 'row' },
-    FlexStartStretch: {display: 'flex',alignItems: 'stretch', flexDirection: 'row' },
-    FlexStartEnd: {display: 'flex',alignItems: 'flex-end', flexDirection: 'row' },
-    FlexEnd: {display: 'flex',justifyContent: 'flex-end', flexDirection: 'row' },
-    FlexEndCenter: {display: 'flex',justifyContent: 'flex-end',alignItems: 'center', flexDirection: 'row' },
-
     Box: { width: '100%', height: '100%', backgroundColor: '#f5f5f5', },
     //布局
     CenterCenter: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', },
@@ -130,6 +112,15 @@ const styCom = StyleSheet.create({
     empty: {
         fontSize: scaleSize(24),
         color: '#999'
+    },
+    arrowdown:{
+        width:scaleSize(22),
+        height:scaleSize(11),
+        top:scaleSize(22),
+        right:scaleSize(15),
+    },
+    posAb:{
+        position:'absolute',
     },
 
 });

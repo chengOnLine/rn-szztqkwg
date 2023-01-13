@@ -35,6 +35,14 @@ class Load extends Component {
         })
     };
 
+    static hide = load => {
+        if (load instanceof RootSiblings) {
+            load.destroy();
+        } else {
+            console.warn(`Toast.hide expected a \`RootSiblings\` instance as argument.\nBut got \`${typeof toast}\` instead.`);
+        }
+    };
+
     componentDidMount = () => {
         // this._load = new RootSiblings(<LoadContainer />);
     };

@@ -16,7 +16,7 @@ import Tabs from '../../components/Public/TabMenu';
 import { HttpGet, HttpPost } from '../../request/index'
 import SvgUri from 'react-native-svg-uri';
 import { Icons } from '../../fonts/fontIcons'
-Picker = {} // picker有问题 不用
+
 let self;
 export default class PatrolDutyedList extends Component {
     constructor(props) {
@@ -55,7 +55,7 @@ export default class PatrolDutyedList extends Component {
 
     componentWillUnmount() {
 
-        Picker.hide();
+        // Picker.hide();
     }
 
     onBackAndroid = () => {
@@ -87,7 +87,7 @@ export default class PatrolDutyedList extends Component {
             pageSize: 10,
         }
 
-        HttpPost('qkwg-flow/flow/patrolDetailed/findPage', params, 'json').then(res => {
+        HttpPost('jczl-flow/flow/patrolDetailed/findPage', params, 'json').then(res => {
             if (res.flag) {
 
                 let resdata = res.data.rows;
@@ -201,54 +201,54 @@ export default class PatrolDutyedList extends Component {
 
         let searchDay = this.state.searchDay.split('-');
 
-        Picker.init({
-            pickerData: data,
-            selectedValue: [searchDay[0], searchDay[1]],
-            pickerTitleText: '巡查时间',
-            pickerConfirmBtnText: '确定',
-            pickerCancelBtnText: '取消',
-            pickerTextEllipsisLen: 12,
-            pickerBg: [255, 255, 255, 1],
-            onPickerConfirm: data => {
-                this.setState({ searchDay: data[0] + '-' + data[1] });
-            },
-            onPickerCancel: data => {
-                Picker.hide();
-            },
-        });
-        Picker.show();
+        // Picker.init({
+        //     pickerData: data,
+        //     selectedValue: [searchDay[0], searchDay[1]],
+        //     pickerTitleText: '巡查时间',
+        //     pickerConfirmBtnText: '确定',
+        //     pickerCancelBtnText: '取消',
+        //     pickerTextEllipsisLen: 12,
+        //     pickerBg: [255, 255, 255, 1],
+        //     onPickerConfirm: data => {
+        //         this.setState({ searchDay: data[0] + '-' + data[1] });
+        //     },
+        //     onPickerCancel: data => {
+        //         Picker.hide();
+        //     },
+        // });
+        // Picker.show();
 
     }
 
     sltPatrolType() {
         let typeVals = ['未巡查', '已巡查', '全部']
 
-        Picker.init({
-            pickerData: typeVals,
-            selectedValue: [this.state.sltSearchText],
-            pickerTitleText: '巡查状态',
-            pickerConfirmBtnText: '确定',
-            pickerCancelBtnText: '取消',
-            pickerTextEllipsisLen: 12,
-            pickerBg: [255, 255, 255, 1],
-            onPickerConfirm: data => {
+        // Picker.init({
+        //     pickerData: typeVals,
+        //     selectedValue: [this.state.sltSearchText],
+        //     pickerTitleText: '巡查状态',
+        //     pickerConfirmBtnText: '确定',
+        //     pickerCancelBtnText: '取消',
+        //     pickerTextEllipsisLen: 12,
+        //     pickerBg: [255, 255, 255, 1],
+        //     onPickerConfirm: data => {
 
-                let sltVal = "-1";
-                if (data[0] == '未巡查') {
-                    sltVal = "0"
-                } else if (data[0] == '已巡查') {
-                    sltVal = "1"
-                }
+        //         let sltVal = "-1";
+        //         if (data[0] == '未巡查') {
+        //             sltVal = "0"
+        //         } else if (data[0] == '已巡查') {
+        //             sltVal = "1"
+        //         }
 
-                this.setState({ sltSearchText: data[0], sltSearchVal: sltVal });
+        //         this.setState({ sltSearchText: data[0], sltSearchVal: sltVal });
 
-                this._getList('')
-            },
-            onPickerCancel: data => {
-                Picker.hide();
-            },
-        });
-        Picker.show();
+        //         this._getList('')
+        //     },
+        //     onPickerCancel: data => {
+        //         Picker.hide();
+        //     },
+        // });
+        // Picker.show();
     }
 
     render() {

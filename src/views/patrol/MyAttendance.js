@@ -16,7 +16,7 @@ import Tabs from '../../components/Public/TabMenu';
 import { HttpGet, HttpPost } from '../../request/index'
 import SvgUri from 'react-native-svg-uri';
 import { Icons } from '../../fonts/fontIcons'
-Picker = {} // picker有问题 不用
+
 let self;
 export default class MyAttendance extends Component {
   constructor(props) {
@@ -61,7 +61,7 @@ export default class MyAttendance extends Component {
 
   componentWillUnmount() {
 
-    Picker.hide();
+    // Picker.hide();
 
   }
 
@@ -104,7 +104,7 @@ export default class MyAttendance extends Component {
       year: this.state.searchDay
     }
 
-    HttpPost('qkwg-system/system/assess/dept/findPage/myDeptTasks', params, 'json').then(res => {
+    HttpPost('jczl-system/system/assess/dept/findPage/myDeptTasks', params, 'json').then(res => {
       if (res.flag) {
 
         let resdata = res.data.rows;
@@ -193,25 +193,25 @@ export default class MyAttendance extends Component {
 
     let data = [years];
 
-    Picker.init({
-      pickerData: data,
-      selectedValue: [this.state.searchDay],
-      pickerTitleText: '巡查时间',
-      pickerConfirmBtnText: '确定',
-      pickerCancelBtnText: '取消',
-      pickerTextEllipsisLen: 12,
-      pickerBg: [255, 255, 255, 1],
-      onPickerConfirm: data => {
-        this.setState({ searchDay: data[0] });
+    // Picker.init({
+    //   pickerData: data,
+    //   selectedValue: [this.state.searchDay],
+    //   pickerTitleText: '巡查时间',
+    //   pickerConfirmBtnText: '确定',
+    //   pickerCancelBtnText: '取消',
+    //   pickerTextEllipsisLen: 12,
+    //   pickerBg: [255, 255, 255, 1],
+    //   onPickerConfirm: data => {
+    //     this.setState({ searchDay: data[0] });
 
-        this.state.offset = 1;
-        this._getList('')
-      },
-      onPickerCancel: data => {
-        Picker.hide();
-      },
-    });
-    Picker.show();
+    //     this.state.offset = 1;
+    //     this._getList('')
+    //   },
+    //   onPickerCancel: data => {
+    //     Picker.hide();
+    //   },
+    // });
+    // Picker.show();
 
   }
 

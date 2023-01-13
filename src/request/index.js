@@ -5,6 +5,8 @@ import React, { Component } from 'react';
 import { toastShort } from '../tools/toastUtil';
 import { CommonActions } from '@react-navigation/native';
 import Load from '../components/Loading/Index';
+import { storageDeleteItem } from '../storage/index'
+import { Decrypt, aesEn,addMD5 } from "../tools/comm";
 
 //先定义延时函数
 const delay = (timeOut = 8 * 1000) => {
@@ -20,17 +22,25 @@ const delay = (timeOut = 8 * 1000) => {
 }
 
 const goLogin = () => {
-    Load.hideAll();
-    
-    //接口请求返回401，重新登录
-    global.navigation.dispatch(
-        CommonActions.reset({
-            index: 0,
-            routes: [
-                { name: 'GMTLogin' },
-            ],
-        })
-    );
+
+    try {
+        Load.hideAll();
+        global.requestHeadAuthorization = "";
+
+        if (global.routeName != "Login") {
+            //接口请求返回401，重新登录
+            global.navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [
+                        { name: 'Login' },
+                    ],
+                })
+            );
+        }
+
+    } catch (err) {
+    }
 }
 
 
@@ -56,11 +66,31 @@ const fetchPromise = (method, url, formData, contentType) => {
         contentVal = method == 'POST' ? 'multipart/form-data' : 'application/x-www-form-urlencoded'
     }
 
+
+    let md5PostData = ''
+    if (formData && method == 'POST') {
+
+        let strParams = '';
+        if (Object.prototype.toString.call(formData) === '[object String]') {
+            strParams = formData;
+        } else {
+            strParams = JSON.stringify(formData);
+        }
+
+        const aesPostData = aesEn(strParams, 'MIGfMA0GCSgGSIb3')
+        md5PostData = addMD5(aesPostData).toString();
+        console.log('md5PostData-->',md5PostData);
+        // console.log('aesPostData-->',aesPostData);
+    }
+
+
     return new Promise((resolve, reject) => {
 
-        if (global.routeName != 'HomePage3') Load.show();
+        Load.show();
 
+        url = url.replace('jczl', 'qkwg');
         let fetchUrl = global.requestApi + url;
+        console.log(fetchUrl)
 
         fetch(fetchUrl, {
             method: method,
@@ -69,30 +99,38 @@ const fetchPromise = (method, url, formData, contentType) => {
                 "X-Requested-With": "XMLHttpRequest",
                 'Content-Type': contentVal,
                 'Authorization': global.requestHeadAuthorization,
+                'zzk': md5PostData
             },
             body: formData
         }).then((response) => {
-            return response.json();
+            try {
+                return response.json();
+            } catch (error) {
+            }
 
         }).then((responseJSON) => {
 
-            Load.hideAll();
+            try {
+                Load.hideAll();
 
-            // console.log("token:" + global.requestHeadAuthorization);
-            console.log("请求URL:" + global.requestApi + url)
-            console.log("请求参数:" + JSON.stringify(formData))
-            console.log("返回结果:" + JSON.stringify(responseJSON))
+                // console.log("token:" + global.requestHeadAuthorization);
+                console.log("请求URL:" + global.requestApi + url)
+                console.log("请求参数:" + JSON.stringify(formData))
+                console.log("返回结果:" + JSON.stringify(responseJSON))
 
-            if (responseJSON.hasOwnProperty("code") && (responseJSON.code == '401')) {
-                toastShort('会话已过期，请您重新登录！', 'bottom');
-                goLogin();
+                if (responseJSON.hasOwnProperty("code") && (responseJSON.code == '401')) {
+                    toastShort('会话已过期，请您重新登录！', 'bottom');
+                    goLogin();
 
-            } else if (responseJSON.hasOwnProperty("code") && (responseJSON.code == '500')) {
-                toastShort('接口异常', 'bottom');
-                reject({ code: '500', message: '接口异常' });
+                } else if (responseJSON.hasOwnProperty("code") && (responseJSON.code == '500')) {
+                    toastShort('接口异常', 'bottom');
+                    reject({ code: '500', message: '接口异常' });
 
-            } else {
-                resolve(responseJSON);
+                } else {
+                    resolve(responseJSON);
+                }
+
+            } catch (error) {
             }
 
         }).catch((err) => {
@@ -108,12 +146,18 @@ const _fetch = (fetchPromise, url) => {
     if (global.requestHeadAuthorization == "" &&
         (url.indexOf('getSystemCurrConfig') < 0
             && url.indexOf('getQueryConfigure') < 0
+            && url.indexOf('oauth/sendVerifyCode') < 0
+            && url.indexOf('oauth/getVerifyCodeImg') < 0
+            && url.indexOf('oauth/mobileLogin') < 0
             && url.indexOf('oauth/token') < 0)) {
 
         toastShort('会话已过期，请您重新登录！', 'bottom');
 
         goLogin();
-        return false;
+
+        return new Promise((resolve, reject) => {
+            resolve({ code: '401', message: '接口异常' });
+        })
     }
 
     // return Promise.race([fetchPromise, delay(10 * 1000)]);
@@ -122,12 +166,12 @@ const _fetch = (fetchPromise, url) => {
 
 //post
 const HttpPost = (url, params, contentType) => {
-    console.log("params" , params)
+
     let formData = new FormData();
     if (params) {
         Object.keys(params).forEach(key => formData.append(key, params[key]));
     }
-    // console.log("HttpPost" ,formData )
+
     return _fetch(fetchPromise('POST', url, formData, contentType), url);
 };
 

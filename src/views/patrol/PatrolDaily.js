@@ -17,6 +17,7 @@ import SvgUri from 'react-native-svg-uri';
 import { Icons } from '../../fonts/fontIcons'
 import { toastShort } from '../../tools/toastUtil';
 import { GPSChange } from "../../tools/comm";
+import { getLocation, getLocation2, } from "../../tools/AmapLocation";
 
 let self;
 export default class PatrolDaily extends Component {
@@ -37,6 +38,7 @@ export default class PatrolDaily extends Component {
         time: 0
       },
 
+      address: "",
       dailyAttendances: [],
       dailyAttendancesInfo: { dayMileage: 0, dayCount: 0, deptName: '' },
       dailyDatas: []
@@ -45,11 +47,13 @@ export default class PatrolDaily extends Component {
   }
   componentDidMount() {
 
+    this.getAddress();
+
     this.unsubscribe = this.props.navigation.addListener('tabPress', e => {
       setTimeout(() => {
         global.routeName = 'PatrolDaily'
       }, 200);
-      
+
     });
 
     let d = new Date();
@@ -75,37 +79,54 @@ export default class PatrolDaily extends Component {
   }
 
 
+
+  getAddress() {
+
+    getLocation().then((res) => {
+
+      const { code, data = {}, error } = res;
+      if (code == 0) {
+        const { address, coords = {} } = data;
+        this.setState({ address: address })
+      }
+    }).catch((error) => { })
+  }
+
   getOwnDailyAttendanceByMonth(val) {
 
     let params = {
       month: val,
     }
 
-    HttpPost('qkwg-flow/flow/dailyAttendance/getOwnDailyAttendanceByMonth', params, 'json').then(res => {
+    HttpPost('qkwg-jcwg/flow/dailyAttendance/getOwnDailyAttendanceByMonth', params, 'json').then(res => {
       if (res.flag) {
+        try {
 
-        let resdata = res.data;
+          let resdata = res.data;
 
-        let { totalMileage, avgMileage, time } = resdata;
-        this.setState({ topStatis: Object.assign({}, this.state.topStatis, { totalMileage, avgMileage, time }) });
+          let { totalMileage, avgMileage, time } = resdata;
+          this.setState({ topStatis: Object.assign({}, this.state.topStatis, { totalMileage, avgMileage, time }) });
 
-        //选中已巡查日期
-        let markedDates = {};
+          //选中已巡查日期
+          let markedDates = {};
 
-        resdata.dailyAttendancesWithDate.forEach(items => {
-          if (items.dailyAttendances.length > 0) {
-            markedDates[items.mileageDate] = { selected: true };
-          }
-        });
+          resdata.dailyAttendancesWithDate.forEach(items => {
+            if (items.dailyAttendances.length > 0) {
+              markedDates[items.mileageDate] = { selected: true };
+            }
+          });
 
-        //获取当月所有的天数巡查记录
-        this.setState({
-          dailyDatas: resdata.dailyAttendancesWithDate,
-          markedDates,
-          markedDates01: Object.assign({}, markedDates)
-        })
+          //获取当月所有的天数巡查记录
+          this.setState({
+            dailyDatas: resdata.dailyAttendancesWithDate,
+            markedDates,
+            markedDates01: Object.assign({}, markedDates)
+          })
 
-        this.getDailyAttendancesInfo(this.state.sltDay)
+          this.getDailyAttendancesInfo(this.state.sltDay)
+
+        } catch (error) {
+        }
 
       } else {
         toastShort('获取信息失败')
@@ -139,27 +160,43 @@ export default class PatrolDaily extends Component {
 
   toAndroidTrack(id) {
 
+    let token = global.requestHeadAuthorization;
+
     //获取当前最新考勤记录，是否在签到中
-    HttpGet('qkwg-flow/flow/dailyAttendance/lastDailySign', null).then((res) => {
+    HttpGet('qkwg-jcwg/flow/dailyAttendance/lastDailySign', null).then((res) => {
       if (res.flag) {
+        try {
+          let signId = '', isSign = false;
+          let signOutTime = '', signTime = '';
 
-        let signId = '', isSign = false;
+          if (res.data.length > 0) {
 
-        let { id, signOutTime, signTime } = res.data;
+            res.data.forEach(item => {
+              signId += item.id + ","
+            })
+            
+            signId = signId.slice(0, signId.length - 1);
+            signOutTime = res.data[0].signOutTime;
+            signTime = res.data[0].signTime;
 
-        if (signOutTime == "" && signTime != "") {
-          // 已签到跳转到地图巡逻页面
-          signId = res.data.id;
-          isSign = true;
+            if (signOutTime == "" && signTime != "") {
+              // 已签到跳转到地图巡逻页面
+              isSign = true;
+            }
+          }
+
+          //startActivityFormJS(String name,String token,boolean isSign,String signId,String signTime)
+
+          let token = global.requestHeadAuthorization;
+          let address = this.state.address;
+
+          NativeModules
+            .AMapLocationModule
+            .startActivityFormJS(token, isSign, signId, signTime, address);
+
+        } catch (error) {
+          console.log(error)
         }
-
-        //startActivityFormJS(String name,String token,boolean isSign,String signId,String signTime)
-
-        let token = global.requestHeadAuthorization;
-
-        NativeModules
-          .AMapLocationModule
-          .startActivityFormJS(token, isSign, signId, signTime);
 
       } else {
         toastShort('获取签到信息失败：' + res.msg, 'bottom');
@@ -219,7 +256,7 @@ export default class PatrolDaily extends Component {
                 <Text style={styles.text06}>{dailyAttendances[i].signTime}</Text>
               </View>
 
-              <View style={{ flexDirection: 'row' }}>
+              <View style={{ flexDirection: 'row',paddingRight:scaleSize(80) }}>
 
                 <SvgUri style={styles.textSearchIcon} width="15" height="15"
                   svgXmlData={`<svg  viewBox="0 0 1024 1024">
@@ -230,17 +267,17 @@ export default class PatrolDaily extends Component {
             </View>
           </View>
 
-          <View style={{ flexDirection: 'row', }}>
+          <View style={{ flexDirection: 'row'}}>
             <View style={styles.ePtion}></View>
-            <View style={{ paddingLeft: scaleSize(25), marginTop: scaleSize(20), marginLeft: scaleSize(-12) }}>
+            <View style={{ paddingLeft: scaleSize(20), marginTop: scaleSize(20), marginLeft: scaleSize(-12) }}>
               <View style={styles.qtitle}>
                 <Text style={styles.text03}>签退</Text>
                 <Text style={styles.text06}>{dailyAttendances[i].signOutTime}</Text>
               </View>
 
-              <View style={{ flexDirection: 'row' }}>
+              <View style={{ flexDirection: 'row',paddingRight:scaleSize(80)  }}>
 
-                <SvgUri style={styles.textSearchIcon} width="15" height="15"
+                <SvgUri style={{marginLeft:scaleSize(10)}} width="15" height="15"
                   svgXmlData={`<svg  viewBox="0 0 1024 1024">
                                   <path d="${Icons.location}" fill="#999999"/>
                                   <path d="${Icons.location1}" fill="#999999"/></svg>`} />
@@ -281,12 +318,12 @@ export default class PatrolDaily extends Component {
             <View style={styles.topMain}>
 
               <View style={styles.topItem}>
-                <Text style={styles.text01}>{this.state.topStatis.totalMileage}</Text>
+                <Text style={styles.text01}>{parseFloat(this.state.topStatis.totalMileage).toFixed(2)}</Text>
                 <Text style={styles.text02}>本月总里程(km)</Text>
               </View>
 
               <View style={styles.topItem}>
-                <Text style={styles.text01}>{this.state.topStatis.avgMileage}</Text>
+                <Text style={styles.text01}>{parseFloat(this.state.topStatis.avgMileage).toFixed(2)}</Text>
                 <Text style={styles.text02}>本月平均里程(km)</Text>
               </View>
 

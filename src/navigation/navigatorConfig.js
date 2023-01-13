@@ -16,7 +16,7 @@ export const NavigatorConfig = {
             // console.log("route:"+route.name)
 
             global.routeName = route.name
-            console.log("global.routeName" , global.routeName)
+            console.log('---------Navigator-------------',global.routeName)
 
             const screenIndex = getCurrentScreenIndex({ navigation, route })
             const screenCount = navigation.getState().index;

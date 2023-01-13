@@ -17,6 +17,7 @@ import SvgUri from 'react-native-svg-uri';
 import { deviceWidth, deviceHeight, scaleSize } from '../../tools/adaptation';
 import Head from '../../components/Public/Head';
 import Bottom from '../../components/Public/TabBottom';
+import { toastShort } from '../../tools/toastUtil';
 import { Icons } from '../../fonts/fontIcons'
 import { HttpGet, HttpPost } from '../../request/index'
 import { storageDeleteItem } from '../../storage/index'
@@ -33,16 +34,28 @@ export default class MyIndex2 extends Component {
         fullName: '',
       },
 
-      msgCount: 0,
+      version: '',
+      msgCount: 0
     };
   }
   componentDidMount() {
 
+
+    this.getPersonalInfo();
+
+    this.getMessageCount();
+
+    //收到监听
+    this.listener = DeviceEventEmitter.addListener('backMyIndex', () => {
+      console.log('backMyIndex', global.routeName);
+
+      this.getMessageCount();
+    })
+
+
     this.unsubscribe = this.props.navigation.addListener('tabPress', e => {
 
-      self.setState({
-        msgCount: global.user.msgCount
-      })
+      this.getMessageCount();
 
       setTimeout(() => {
         global.routeName = 'MyIndex'
@@ -50,7 +63,9 @@ export default class MyIndex2 extends Component {
 
     });
 
-    this.getPersonalInfo();
+    this.setState({
+      version: global.version.curNumber
+    })
 
   }
 
@@ -59,36 +74,54 @@ export default class MyIndex2 extends Component {
     this.unsubscribe();
   }
 
-  getPersonalInfo() {
 
-    HttpGet('qkwg-system/system/user/personalCenter', null).then((res) => {
+  getMessageCount() {
 
+    let params = {}
+    HttpPost('qkwg-system/system/messageList/allMessageIsReadNumber', params, 'json').then(res => {
       if (res.flag) {
 
-        if (res.data == null) {
-          return false;
-        }
+        try {
+          this.setState({ msgCount: res.data })
 
-        let { fullName, roleName, iconImgs } = res.data;
-
-        let userImg = ''
-        if (iconImgs != "" || iconImgs.length > 0) {
-          userImg = iconImgs[0].url
-        } else {
-          //默认图像
-          userImg = "https://mdajtest.szzt.com.cn/upload/image/20220428/1651117755943_eaba8c1e4a564fe6a4c3430bec05ab66.JPG";
-        }
-
-        self.setState({
-          userInfo: {
-            fullName, roleName, userImg,
-          },
-          msgCount: global.user.msgCount
-        })
-
-      } else {
-        toastShort(res.msg, 'bottom');
+        } catch (error) { }
       }
+    })
+
+  }
+
+  getPersonalInfo() {
+
+    HttpGet('jczl-system/system/user/personalCenter', null).then((res) => {
+
+      try {
+
+        if (res.flag) {
+          if (res.data == null) {
+            return false;
+          }
+
+          let { fullName, roleName, iconImgs } = res.data;
+
+          let userImg = ''
+          if (iconImgs != "" || iconImgs.length > 0) {
+            userImg = iconImgs[0].url
+          } else {
+            //默认图像
+            userImg = "https://mdajtest.szzt.com.cn/upload/image/20220428/1651117755943_eaba8c1e4a564fe6a4c3430bec05ab66.JPG";
+          }
+
+          self.setState({
+            userInfo: {
+              fullName, roleName, userImg,
+            },
+          })
+
+        } else {
+          toastShort(res.msg, 'bottom');
+        }
+
+      } catch (error) { }
 
     }).catch((error) => {
       // console.log(error);
@@ -133,7 +166,7 @@ export default class MyIndex2 extends Component {
           text: '确定',
           onPress: () => {
 
-            HttpGet('qkwg-oauth-server/auth/loginOut/0', null).then((res) => {
+            HttpGet('jczl-oauth-server/auth/loginOut/0', null).then((res) => {
               if (res.flag) {
                 console.log('退出成功')
               } else {
@@ -144,16 +177,21 @@ export default class MyIndex2 extends Component {
               toastShort(error, 'bottom');//超时会在这里
             })
 
+            try {
 
-            global.requestHeadAuthorization = "";
-            storageDeleteItem("requestHeadAuthorization");
-            //设置路由返回第一个界面
-            global.navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: 'Login' },],
-              })
-            );
+              global.requestHeadAuthorization = "";
+              storageDeleteItem("requestHeadAuthorization");
+
+              if (global.navigation.dispatch) {
+                //设置路由返回第一个界面
+                global.navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'Login' },],
+                  })
+                );
+              }
+            } catch (error) { }
 
           },
         },
@@ -174,7 +212,7 @@ export default class MyIndex2 extends Component {
 
           <View style={styles.topMain}>
 
-            <ImageBackground style={{ flex: 1 }}
+            <ImageBackground style={{ flex: 1, height: scaleSize(350) }}
               source={require('../../assets/myIndex/topbg.png')}>
 
               {/* 个人资料 */}
@@ -211,7 +249,7 @@ export default class MyIndex2 extends Component {
                   <SvgUri style={styles.rightIcon} svgXmlData={`<svg  viewBox="0 0 1024 1024"><path d="${Icons.moree}" fill="#C5C5C5"></path></svg>`} />
                 </View>
               </TouchableOpacity>
-
+              {/* 
               <TouchableOpacity
                 onPress={() => { this.goWeb('/pages/me/myDrafts/index') }}
                 style={styles.userMeun}>
@@ -224,9 +262,36 @@ export default class MyIndex2 extends Component {
                 <View>
                   <SvgUri style={styles.rightIcon} svgXmlData={`<svg  viewBox="0 0 1024 1024"><path d="${Icons.moree}" fill="#C5C5C5"></path></svg>`} />
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
+
+
 
               <TouchableOpacity
+                onPress={() => { this.goWeb('/pages/me/myNews/index') }}
+                style={styles.userMeun}>
+                <View style={styles.userMeunItem}>
+
+                  <Image style={styles.userMeunIcon} source={require('../../assets/myIndex/usIcon07.png')} />
+                  <Text style={styles.userMeunFont}>我的消息</Text>
+                </View>
+
+                <View>
+                  <SvgUri style={styles.rightIcon} svgXmlData={`<svg  viewBox="0 0 1024 1024"><path d="${Icons.moree}" fill="#C5C5C5"></path></svg>`} />
+                </View>
+
+                {
+                  this.state.msgCount > 0 ? <View style={{
+                    backgroundColor: '#f90e0e', paddingTop: scaleSize(2), paddingBottom: scaleSize(2),
+                    paddingLeft: scaleSize(5), paddingRight: scaleSize(10),
+                    borderRadius: scaleSize(20), position: 'absolute', top: 5, left: 100, zIndex: 15,
+                  }}>
+                    <Text style={{ color: '#fff', fontSize: scaleSize(20) }}> {this.state.msgCount > 99 ? '99+' : this.state.msgCount}</Text>
+                  </View> : null
+                }
+
+              </TouchableOpacity>
+
+              {/* <TouchableOpacity
                 onPress={() => { this.goWeb('MailList', 'app') }}
                 style={styles.userMeun}>
                 <View style={styles.userMeunItem}>
@@ -238,7 +303,7 @@ export default class MyIndex2 extends Component {
                 <View>
                   <SvgUri style={styles.rightIcon} svgXmlData={`<svg  viewBox="0 0 1024 1024"><path d="${Icons.moree}" fill="#C5C5C5"></path></svg>`} />
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
             </View>
 
@@ -258,7 +323,7 @@ export default class MyIndex2 extends Component {
                   <SvgUri style={styles.rightIcon} svgXmlData={`<svg  viewBox="0 0 1024 1024"><path d="${Icons.moree}" fill="#C5C5C5"></path></svg>`} />
                 </View>
               </TouchableOpacity>
-
+              {/* 
               <TouchableOpacity
 
                 onPress={() => { this.goWeb('/pages/me/suggestions/index') }}
@@ -271,7 +336,7 @@ export default class MyIndex2 extends Component {
                 <View>
                   <SvgUri style={styles.rightIcon} svgXmlData={`<svg  viewBox="0 0 1024 1024"><path d="${Icons.moree}" fill="#C5C5C5"></path></svg>`} />
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               {/* <TouchableOpacity style={styles.userMeun}>
               <View style={styles.userMeunItem}>
@@ -309,10 +374,12 @@ export default class MyIndex2 extends Component {
             <Text style={styles.outloginft}>退出登录</Text>
           </TouchableOpacity>
 
+          <View style={{ marginTop: scaleSize(100) }}><Text style={{ color: "#999" }}>{this.state.version}</Text></View>
+
         </View>
 
         {/* 积分商城，我的积分，奖励分申请 */}
-        <View style={styles.topBanner}>
+        {/* <View style={styles.topBanner}>
 
           <TouchableOpacity
             style={styles.bannerItem}
@@ -356,7 +423,7 @@ export default class MyIndex2 extends Component {
             </View>
           </TouchableOpacity>
 
-        </View>
+        </View> */}
 
         {/* <Bottom active="s" navigation={this.props.navigation} /> */}
       </View>
@@ -377,7 +444,8 @@ const styles = StyleSheet.create({
   },
 
   menuCon: {
-    backgroundColor: '#fff', width: '100%', marginTop: scaleSize(60),
+    backgroundColor: '#fff', width: '100%',
+    // marginTop: scaleSize(50),
     borderRadius: scaleSize(20),
   },
 

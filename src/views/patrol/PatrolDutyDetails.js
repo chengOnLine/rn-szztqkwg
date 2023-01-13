@@ -58,7 +58,7 @@ export default class PatrolDutyDetails extends Component {
 
     getPatrolDetails() {
 
-        HttpGet('qkwg-flow/flow/patrolEvent/getDetailById', { id: this.state.id }).then((res) => {
+        HttpGet('jczl-flow/flow/patrolEvent/getDetailById', { id: this.state.id }).then((res) => {
             if (res.flag) {
 
                 let marks = [];
@@ -89,7 +89,7 @@ export default class PatrolDutyDetails extends Component {
             longitude: this.state.longitude,
         }
 
-        HttpPost('qkwg-flow/flow/patrolDetailed/update', params, 'json').then(res => {
+        HttpPost('jczl-flow/flow/patrolDetailed/update', params, 'json').then(res => {
             if (res.flag) {
 
                 toastShort('操作成功');

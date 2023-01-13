@@ -7,9 +7,9 @@ import {
 
 class ShakingText extends Component {
 
-  componentWillMount() {
-    this.shakedValue = new Animated.Value(0);
-  }
+  // componentWillMount() {
+  //   this.shakedValue = new Animated.Value(0);
+  // }
 
   get animatedStyle() {
     return {
