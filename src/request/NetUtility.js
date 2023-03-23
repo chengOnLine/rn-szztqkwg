@@ -3,7 +3,7 @@
  */
 import React, { Component } from 'react';
 import { getUUID } from "../tools/comm";
-import {toastShort} from "../tools/toastUtil";
+import { toastShort } from "../tools/toastUtil";
 
 const delay = timeout => {
     return new Promise((resolve, reject) => {
@@ -93,6 +93,9 @@ const post = (url, params, headers, callback) => {
             fetchData.body = formData;
         }
 
+        // console.log("请求接口：" + url);
+        // console.log("请求参数：" + JSON.stringify(params))
+
         //fetch请求
         fetch(url, fetchData).then((response) => {
             try {
@@ -117,6 +120,7 @@ const post = (url, params, headers, callback) => {
                 callback(responseJSON);
 
             } catch (e) {
+                console.log("请求接口：" + url);
                 console.log('callback', e);
                 callback({ code: '119', msg: '网络错误，请重试！' });
             }

@@ -12,14 +12,16 @@ import AlertContainer from '../../components/Public/AlertContainer';
 import Tabs from '../../components/Public/TabMenu';
 import Swiper from 'react-native-swiper';
 import styCom from '../../styles/index'
+import { post } from "../../request/NetUtility";
 
 import { HttpGet, HttpPost } from '../../request/index'
 import { toastShort } from '../../tools/toastUtil';
 import SvgUri from 'react-native-svg-uri';
 import { Icons } from '../../fonts/fontIcons'
-import { storageGet } from '../../storage/index'
+import { storageSet, storageGet } from '../../storage/index'
 import UpdateVersion from '../../components/Index/UpdateVersion';
 import { getLocation, getLocation2, } from "../../tools/AmapLocation";
+import { decryptKeyVal } from '../../tools/comm'
 
 
 let n, self, backNum = 0;
@@ -199,7 +201,7 @@ export default class HomePage extends Component {
             if (code == 0) {
                 const { address, coords = {} } = data;
                 this.setState({ address: address })
-                
+
                 this.toAndroidTrack();
             }
         }).catch((error) => { })
@@ -212,7 +214,7 @@ export default class HomePage extends Component {
         //获取当前最新考勤记录，是否在签到中
         HttpGet('qkwg-jcwg/flow/dailyAttendance/lastDailySign', null).then((res) => {
 
-            
+
             if (res.flag) {
                 try {
                     let signId = '', isSign = false;
@@ -439,6 +441,99 @@ export default class HomePage extends Component {
         }
     }
 
+
+
+    //获取治理通的登录token
+    getZLTtoken() {
+
+        HttpGet('qkwg-system/system/user/getToken/' + global.zltUser.userName, null).then((res) => {
+            if (res.flag) {
+                let data = res.data;
+
+                console.log('getZLTtoken', data);
+
+                global.zlt_oauthToken = "Bearer " + data;
+                storageSet('oauthToken', global.zlt_oauthToken);
+
+                this.getZLTUserInfo();
+
+            } else {
+                global.zlt_oauthToken = "";
+                toastShort("该用户没有权限登录3", 'bottom');
+            }
+        }).catch((error) => {
+            toastShort(error, 'bottom');//超时会在这里
+        })
+    }
+
+    getZLTUserInfo() {
+        let self = this;
+
+        let postLogin = {
+            param3: global.zltVersion.curNumber,
+            param4: "",
+            lat: '',
+            lng: '',
+            currentRole: '',
+        };
+
+        post(global.zlt_requestApi + '/zty-system/sys/sysuser/loginOperate', postLogin, null, function (res) {
+
+            if (res.hasOwnProperty("flag")) {
+                if (res.flag) {
+                    let { mainKey, user } = res.data;
+
+                    // res.data.appRoleList=decryptKeyVal(appRoleList,mainKey);
+                    res.data.user = decryptKeyVal(user, mainKey);
+                    // console.log(res);
+
+                    let { communityId, communityName, deptId, deptName, email, fullName, gridId, gridName,
+                        identity, password, phone, picAddress, princeArea, roleId, roleKey, roleName, sex,
+                        streetId, userId, cardId, appRoleList } = JSON.parse(res.data.user);
+
+                    // let {token,userUid} = res.data.sesMap;
+                    // console.log('appLogin result',global.user.info);
+                    global.zltUser.info = {
+                        //id,userName,password,identity,departmentId,sex,email,phone
+                        id: userId,
+                        userName: fullName,
+                        password,
+                        identity,
+                        departmentId: deptId == undefined ? 0 : deptId,
+                        sex,
+                        phone,
+                        email,
+                        communityId,
+                        communityName,
+                        deptName,
+                        gridId,
+                        gridName,
+                        picAddress,
+                        princeArea,
+                        roleId,
+                        roleKey,
+                        roleName,
+                        streetId,
+                        cardId
+                    };
+
+                    global.user.appRoleList = JSON.parse(appRoleList);
+
+                    storageSet('zlt_curUserInfo', global.zltUser);
+                    console.log('zlt_curUserInfo:' + JSON.stringify(global.zltUser.info))
+
+                    global.navigation.navigate('LongBanManage');
+
+                } else {
+                    toastShort("该用户没有权限登录1", 'bottom');
+                }
+            } else {
+                toastShort("该用户没有权限登录2", 'bottom');
+            }
+        })
+    }
+
+
     //加对应的子菜单
     laodAppMenuList(pid, meunList, meunType) {
 
@@ -597,7 +692,17 @@ export default class HomePage extends Component {
             }
 
         } else {
-            if (typeof (PageName) != "undefined" && PageName != '') global.navigation.navigate(PageName);
+            //LongBanManage todo:需要选择用户- this.getOldUserList();
+            if (PageName == "LongBanManage") {
+                this.setState({ toH5PageUrl: 'LongBanManage', })
+
+                isShowSltUser = this.getOldUserList();
+                if (isShowSltUser) this.getZLTtoken()
+
+            } else {
+                if (typeof (PageName) != "undefined" && PageName != '') global.navigation.navigate(PageName);
+            }
+
         }
     }
 
@@ -661,11 +766,17 @@ export default class HomePage extends Component {
         let PageName = this.state.toH5PageName;
         let outCode = this.state.toH5OutCode;
 
-        self.props.navigation.navigate('Web', {
-            outCode: outCode,
-            h5Url: h5Url,
-            isOldPage: true  //老版本H5只能url获取token
-        })
+        if (this.state.toH5PageUrl == "LongBanManage") {
+            this.getZLTtoken();
+        } else {
+
+            self.props.navigation.navigate('Web', {
+                outCode: outCode,
+                h5Url: h5Url,
+                isOldPage: true  //老版本H5只能url获取token
+            })
+
+        }
     }
 
 

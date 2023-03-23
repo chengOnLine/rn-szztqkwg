@@ -31,31 +31,31 @@ export function addbase64(str: string) {
  * 返回对象
  * 加密后参数
  */
-export function encryptesc(val){
+export function encryptesc(val) {
     let word = val;
     let key = CryptoJS.enc.Utf8.parse(global.keys);
     let srcs = CryptoJS.enc.Utf8.parse(word);
-    let encrypted = CryptoJS.AES.encrypt(srcs, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+    let encrypted = CryptoJS.AES.encrypt(srcs, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 });
     let str = CryptoJS.enc.Utf8.parse(encrypted.toString());
     let base64 = CryptoJS.enc.Base64.stringify(str);
     // return encrypted.toString();
     return base64;
 }
 
-export function encrypKeyVal(val, keyVal){
+export function encrypKeyVal(val, keyVal) {
     let word = val;
     let key = CryptoJS.enc.Utf8.parse(keyVal);
     let srcs = CryptoJS.enc.Utf8.parse(word);
-    let encrypted = CryptoJS.AES.encrypt(srcs, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+    let encrypted = CryptoJS.AES.encrypt(srcs, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 });
     let str = CryptoJS.enc.Utf8.parse(encrypted.toString());
     let base64 = CryptoJS.enc.Base64.stringify(str);
     // return encrypted.toString();
     return base64;
 }
 
-export function decryptKeyVal(word,keyVal) {
+export function decryptKeyVal(word, keyVal) {
     let keyDecrypt = CryptoJS.enc.Utf8.parse(keyVal);
-    var decrypt = CryptoJS.AES.decrypt(word, keyDecrypt, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+    var decrypt = CryptoJS.AES.decrypt(word, keyDecrypt, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 });
 
     return CryptoJS.enc.Utf8.stringify(decrypt).toString();
 }
@@ -86,25 +86,25 @@ export function Encrypt(word) {
 
 
 
-  //aes加密
-  export function aesEn(word, key) {
+//aes加密
+export function aesEn(word, key) {
     let keys = CryptoJS.enc.Utf8.parse(key)
     var srcs = CryptoJS.enc.Utf8.parse(word)
     var encrypted = CryptoJS.AES.encrypt(srcs, keys, {
-      mode: CryptoJS.mode.ECB,
-      padding: CryptoJS.pad.Pkcs7
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7
     })
     return encrypted.toString()
-  }
-  //aes解密
-  export function aesDe(word, key) {
+}
+//aes解密
+export function aesDe(word, key) {
     let keys = CryptoJS.enc.Utf8.parse(key)
     var decrypt = CryptoJS.AES.decrypt(word, keys, {
-      mode: CryptoJS.mode.ECB,
-      padding: CryptoJS.pad.Pkcs7
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7
     })
     return CryptoJS.enc.Utf8.stringify(decrypt).toString()
-  }
+}
 
 /**
  * 手机号码
@@ -119,20 +119,20 @@ export function Encrypt(word) {
 export function phone(size: number) {
     let rule = /^1[3456789]\d{9}$/;
     let res = {
-        status:true,
-        tip:'输入正确'
+        status: true,
+        tip: '输入正确'
     }
-    if(size == ''){
+    if (size == '') {
         res.status = false;
         res.tip = '手机号码不能为空！'
         return res;
     }
-    if(size.length < 11){
+    if (size.length < 11) {
         res.status = false;
         res.tip = '手机号码格式错误！'
         return res;
     }
-    if(!rule.test(size)){
+    if (!rule.test(size)) {
         res.status = false;
         res.tip = '手机号码格式错误！'
         return res;
@@ -143,18 +143,18 @@ export function phone(size: number) {
 /*
  *邮箱格式验证
  */
-export function email(str:string){
+export function email(str: string) {
     let rule = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"); //正则表达式
     let res = {
-        status:true,
-        tip:'输入正确'
+        status: true,
+        tip: '输入正确'
     }
-    if(str == ''){ //输入不能为空
+    if (str == '') { //输入不能为空
         res.status = false;
         res.tip = '邮箱输入不能为空！'
         return res;
     }
-    if(!rule.test(str)){ //正则验证不通过，格式不对
+    if (!rule.test(str)) { //正则验证不通过，格式不对
         res.status = false;
         res.tip = '邮箱格式错误！'
         return res;
@@ -175,17 +175,17 @@ export function email(str:string){
  * status: true or false
  * 例：VauleLength('123456','验证码)
  */
-export function VauleLength(size: number,tip:string,min=6,max=30) {
+export function VauleLength(size: number, tip: string, min = 6, max = 30) {
     let res = {
-        status:true,
-        tip:'输入正确'
+        status: true,
+        tip: '输入正确'
     }
-    if(size == ''){
+    if (size == '') {
         res.status = false;
         res.tip = tip;
         return res;
     }
-    if(size.length < min || size.length > max){
+    if (size.length < min || size.length > max) {
         res.status = false;
         res.tip = tip
         return res;
@@ -200,7 +200,7 @@ export function VauleLength(size: number,tip:string,min=6,max=30) {
  * 格式：134****9090
  */
 export function repleaceStr(str: string) {
-    let str1 = str.substr(3,4);
+    let str1 = str.substr(3, 4);
     str = str.replace(str1, '****');
     return str;
 }
@@ -213,26 +213,26 @@ export function repleaceStr(str: string) {
  * true or false
  *  例：versionContrast('1.1.1','1.1.2')
  */
-export function versionContrast(str: string,str1: string) {
+export function versionContrast(str: string, str1: string) {
     // console.log(str+'.'+str1)
     let strArr = str.split('.');
     let strArr1 = str1.split('.');
-    if(parseInt(strArr[0]) < parseInt(strArr1[0])){
+    if (parseInt(strArr[0]) < parseInt(strArr1[0])) {
         return true;
     }
-    if(parseInt(strArr[0]) > parseInt(strArr1[0])){
+    if (parseInt(strArr[0]) > parseInt(strArr1[0])) {
         return false;
     }
-    if(parseInt(strArr[1]) < parseInt(strArr1[1])){
+    if (parseInt(strArr[1]) < parseInt(strArr1[1])) {
         return true;
     }
-    if(parseInt(strArr[1]) > parseInt(strArr1[1])){
+    if (parseInt(strArr[1]) > parseInt(strArr1[1])) {
         return false;
     }
-    if(parseInt(strArr[2]) < parseInt(strArr1[2])){
+    if (parseInt(strArr[2]) < parseInt(strArr1[2])) {
         return true;
     }
-    if(parseInt(strArr[2]) >= parseInt(strArr1[2])){
+    if (parseInt(strArr[2]) >= parseInt(strArr1[2])) {
         return false;
     }
     return false;
@@ -249,11 +249,11 @@ export function versionContrast(str: string,str1: string) {
  * 例：getStrlast('12345678')；返回：5678
  * 例：getStrlast('12345678',5)；返回：45678
  */
-export function getStrlast(str: string,len=4) {
-    if(str.length <= len){
+export function getStrlast(str: string, len = 4) {
+    if (str.length <= len) {
         return str;
     }
-    let str1 = str.substr(str.length-len);
+    let str1 = str.substr(str.length - len);
     return str1;
 }
 
@@ -267,7 +267,7 @@ export function getStrlast(str: string,len=4) {
  * 例：getStrlast('12345678')；返回：2017.09.09
  * 例：getStrlast('12345678','-')；返回：2017-09-09
  */
-export function TransferData(timestamp,pattern='.'){
+export function TransferData(timestamp, pattern = '.') {
     var timestamp = timestamp;
     var d = new Date(timestamp * 1000);    //根据时间戳生成的时间对象
     var yy = d.getFullYear();      //年
@@ -282,10 +282,10 @@ export function TransferData(timestamp,pattern='.'){
     //     clock += mm + "-";
     // }else{
     var clock = yy + pattern;
-    if(mm < 10) clock += "0";
+    if (mm < 10) clock += "0";
     clock += mm + pattern;
     // }
-    if(dd < 10) clock += "0";
+    if (dd < 10) clock += "0";
     clock += dd + " ";
     // if(hh < 10) clock += "0";
     // clock += hh + ":";
@@ -307,7 +307,7 @@ export function TransferData(timestamp,pattern='.'){
  * 例：getStrlast('12345678')；返回：2017.09.09
  * 例：getStrlast('12345678','-')；返回：2017-09-09
  */
-export function TransferDataAll(timestamp,pattern='-'){
+export function TransferDataAll(timestamp, pattern = '-') {
     var timestamp = timestamp;
     var d = new Date(timestamp * 1000);    //根据时间戳生成的时间对象
     var yy = d.getFullYear();      //年
@@ -316,18 +316,18 @@ export function TransferDataAll(timestamp,pattern='-'){
     var hh = d.getHours();         //时
     var ii = d.getMinutes();       //分
     var ss = d.getSeconds();       //秒
-    if(pattern == '-'){
+    if (pattern == '-') {
         var clock = yy + "-";
-        if(mm < 10) clock += "0";
+        if (mm < 10) clock += "0";
         clock += mm + "-";
-    }else{
+    } else {
         var clock = yy + pattern;
-        if(mm < 10) clock += "0";
+        if (mm < 10) clock += "0";
         clock += mm + pattern;
     }
-    if(dd < 10) clock += "0";
+    if (dd < 10) clock += "0";
     clock += dd + " ";
-    if(hh < 10) clock += "0";
+    if (hh < 10) clock += "0";
     clock += hh + ":";
     if (ii < 10) clock += "0";
     clock += ii + ":";
@@ -346,38 +346,38 @@ export function TransferDataAll(timestamp,pattern='-'){
  * 时间
  * 例：
  */
-export function TransferTime(s,p=":",iss=true){
+export function TransferTime(s, p = ":", iss = true) {
 
     let t = '';
-    if(s > -1){
-        var hour = Math.floor(s/3600);
-        var min = Math.floor(s/60) % 60;
+    if (s > -1) {
+        var hour = Math.floor(s / 3600);
+        var min = Math.floor(s / 60) % 60;
         var sec = s % 60;
-        if(iss){
-            if(hour < 10) {
-                t = '0'+ hour;
+        if (iss) {
+            if (hour < 10) {
+                t = '0' + hour;
             } else {
-                t = hour ;
+                t = hour;
             }
-            if(p == 'ch'){
+            if (p == 'ch') {
                 t += "时"
-            }else{
+            } else {
                 t += p
             }
         }
-        if(min < 10){t += "0";}
+        if (min < 10) { t += "0"; }
         t += min;
-        if(p == 'ch'){
+        if (p == 'ch') {
             t += "分"
-        }else{
+        } else {
             t += p
         }
 
-        if(sec < 10){t += "0";}
+        if (sec < 10) { t += "0"; }
         t += sec;
-        if(p == 'ch'){
+        if (p == 'ch') {
             t += "秒"
-        }else{
+        } else {
             // t += p
         }
     }
@@ -392,12 +392,11 @@ export function TransferTime(s,p=":",iss=true){
  * 1,890.00
  *
  */
-export function sliceStr(str:string){
+export function sliceStr(str: string) {
     let arr = str.split(".");
     let l = arr[0].split("").reverse();
     t = "";
-    for(i = 0; i < l.length; i ++ )
-    {
+    for (i = 0; i < l.length; i++) {
         t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
     }
     arr[0] = t.split("").reverse().join("");
@@ -412,7 +411,7 @@ export function sliceStr(str:string){
  * 数组
  * 例：sliceStrPrice('1,890.00')；返回：['1,890','00']
  */
-export function sliceStrPrice(str:string){
+export function sliceStrPrice(str: string) {
     let arr = str.split(".");
     return arr;
 }
@@ -425,8 +424,8 @@ export function sliceStrPrice(str:string){
  * 返回
  * true or false
  */
-export function hasSomeStr(str: string,res:string) {
-    if(str.indexOf(res) >= 0 ){
+export function hasSomeStr(str: string, res: string) {
+    if (str.indexOf(res) >= 0) {
         return true;
     }
     return false;
@@ -441,8 +440,8 @@ export function hasSomeStr(str: string,res:string) {
  * 去掉res后的str
  * 例：delLastStr('10天','天')；返回：'10'
  */
-export function delLastStr(str: string,res:string) {
-    let str1 = str.replace(res,'');
+export function delLastStr(str: string, res: string) {
+    let str1 = str.replace(res, '');
     return str1;
 }
 
@@ -456,20 +455,16 @@ export function delLastStr(str: string,res:string) {
  * 例
  *
  */
-export function removeArr(array,index)
-{
-    if(index<=(array.length-1))
-    {
-        for(var i=index;i<array.length;i++)
-        {
-            array[i]=array[i+1];
+export function removeArr(array, index) {
+    if (index <= (array.length - 1)) {
+        for (var i = index; i < array.length; i++) {
+            array[i] = array[i + 1];
         }
     }
-    else
-    {
+    else {
         throw new Error('超出最大索引！');
     }
-    array.length=array.length-1;
+    array.length = array.length - 1;
     return array;
 }
 
@@ -482,14 +477,14 @@ export function removeArr(array,index)
  * 例
  * GetUrlPara('a.html?code=123&h=345') 返回 {code:'123',h:'345'}
  */
-export function GetUrlPara(url: string){
+export function GetUrlPara(url: string) {
     let arrUrl = url.split("?");
     let para = arrUrl[1];
     let paraArr = para.split("&");
     let obj = {};
-    for(let i=0;i<paraArr.length;i++){
+    for (let i = 0; i < paraArr.length; i++) {
         let p = paraArr[i].split("=");
-        obj[p[0]]=p[1];
+        obj[p[0]] = p[1];
     }
     return obj;
 }
@@ -501,10 +496,10 @@ export function GetUrlPara(url: string){
  * 返回格式：
  * 角色名
  */
-export function GetUserName(id: string){
+export function GetUserName(id: string) {
     let s = '';
-    for(let i=0;i<global.user.identityData.length;i++){
-        if(id == global.user.identityData[i].id){
+    for (let i = 0; i < global.user.identityData.length; i++) {
+        if (id == global.user.identityData[i].id) {
             s = global.user.identityData[i].name
         }
     }
@@ -518,7 +513,7 @@ export function GetUserName(id: string){
  *isIgnore:是否忽略大小写 默认忽略
  *返回 次数
  */
-export function countSubstr(str, substr, isIgnore=true) {
+export function countSubstr(str, substr, isIgnore = true) {
     var count;
     var reg = "";
     if (isIgnore == true) {
@@ -535,7 +530,7 @@ export function countSubstr(str, substr, isIgnore=true) {
     return count;
 }
 
-export function getFormatDate(date){
+export function getFormatDate(date) {
     var seperator1 = "-";
     var month = date.getMonth() + 1;
     var strDate = date.getDate();
@@ -552,7 +547,7 @@ export function getFormatDate(date){
     return currentdate;
 }
 
-export function getFormatDate2(date){
+export function getFormatDate2(date) {
     var seperator1 = "-";
     var month = date.getMonth() + 1;
     var strDate = date.getDate();
@@ -589,7 +584,7 @@ export function getNowFormatDate() {
         second = "0" + second;
     }
     var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
-        + " " + hour+ seperator2 + min
+        + " " + hour + seperator2 + min
         + seperator2 + second;
     return currentdate;
 }
@@ -605,12 +600,12 @@ export function returnTime(date) {
     if (strDate >= 0 && strDate <= 9) {
         strDate = "0" + strDate;
     }
-    var currentdate = date.getFullYear() +''+ month +''+ strDate;
+    var currentdate = date.getFullYear() + '' + month + '' + strDate;
     return currentdate;
 }
 
 // 获取当前时间 返回 2017-09-08
-export function getTimedate(params='-') {
+export function getTimedate(params = '-') {
     var date = new Date();
     var month = date.getMonth() + 1;
     var strDate = date.getDate();
@@ -620,7 +615,7 @@ export function getTimedate(params='-') {
     if (strDate >= 0 && strDate <= 9) {
         strDate = "0" + strDate;
     }
-    var currentdate = date.getFullYear() +params+ month +params+ strDate;
+    var currentdate = date.getFullYear() + params + month + params + strDate;
     return currentdate;
 }
 
@@ -633,9 +628,9 @@ export function getTimedate(params='-') {
  *返回
  *base64 拼接字符串
  */
-export function splitImgs(imgs,split='@@',islong=false) {
+export function splitImgs(imgs, split = '@@', islong = false) {
     var str = '';
-    if(imgs.length < 1){
+    if (imgs.length < 1) {
         return str;
     }
 
@@ -644,9 +639,9 @@ export function splitImgs(imgs,split='@@',islong=false) {
     //         str = 'data:'+imgs[0].mime+';base64,' + imgs[0].data;
     //     }
     // }else{
-    for(let i=0;i<imgs.length;i++){
-        if(imgs[i].data){
-            if(i == imgs.length-1){
+    for (let i = 0; i < imgs.length; i++) {
+        if (imgs[i].data) {
+            if (i == imgs.length - 1) {
                 // if(islong){
                 //     str += 'data:'+imgs[i].mime+';base64,' + imgs[i].data
                 // }else{
@@ -654,7 +649,7 @@ export function splitImgs(imgs,split='@@',islong=false) {
                 // }
                 //
 
-            }else{
+            } else {
                 // if(islong){
                 //     str += 'data:'+imgs[i].mime+';base64,' + imgs[i].data + split
                 // }else{
@@ -679,10 +674,10 @@ export function splitImgs(imgs,split='@@',islong=false) {
  *返回
  *数组
  */
-export function strToArray(str,substr='@@') {
+export function strToArray(str, substr = '@@') {
     let arr = [];
-    if(str == ''){return arr};
-    if(str.indexOf(substr) < 1){
+    if (str == '') { return arr };
+    if (str.indexOf(substr) < 1) {
         arr.push(str);
         return arr;
     }
@@ -696,12 +691,10 @@ export function strToArray(str,substr='@@') {
  *返回
  *true or false
  */
-export function isCardNo(card)
-{
+export function isCardNo(card) {
     // 身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X
     var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-    if(reg.test(card) === false)
-    {
+    if (reg.test(card) === false) {
         // alert("身份证输入不合法");
         return false;
     }
@@ -717,15 +710,14 @@ export function isCardNo(card)
  *返回
  *true or false
  */
-export function arrToStr(arr,parmas,split=",")
-{
-    if(arr.length < 1){
+export function arrToStr(arr, parmas, split = ",") {
+    if (arr.length < 1) {
         return '';
     }
     let s = '';
-    for(let i=0;i<arr.length;i++){
+    for (let i = 0; i < arr.length; i++) {
         s += arr[i][parmas];
-        if(i != arr.length -1){
+        if (i != arr.length - 1) {
             s += split;
         }
     }
@@ -746,7 +738,7 @@ export function _getDataArr() {
     var hour = parseInt(date.getHours());
     var min = parseInt(date.getMinutes());
     var second = parseInt(date.getSeconds());
-    let arr = [y,month,strDate,hour,min,second];
+    let arr = [y, month, strDate, hour, min, second];
     return arr;
 }
 
@@ -756,10 +748,10 @@ export function _getDataArr() {
  *返回
  *2017/10/25
  */
-export function getDataStr(str){
+export function getDataStr(str) {
     let s = '';
     let d = str.split('-');
-    s += d[0]+'/'+d[1]+'/'+d[2].substr(0,2);
+    s += d[0] + '/' + d[1] + '/' + d[2].substr(0, 2);
     return s;
 }
 
@@ -769,20 +761,20 @@ export function getDataStr(str){
  *返回
  *[{longitude:123,latitude:123}]
  */
-export function mappoint(str){
+export function mappoint(str) {
     let arr = [];
     let data1 = [];
     let d = str.split(',');
     let data2 = [];
-    for(let i=0;i<d.length;i++){
-        if(i%2 == 0){
+    for (let i = 0; i < d.length; i++) {
+        if (i % 2 == 0) {
             data1.push(d[i])
-        }else{
+        } else {
             data2.push(d[i])
         }
     }
-    for(let i=0;i<data1.length;i++){
-        arr.push({longitude:parseFloat(data1[i]),latitude:parseFloat(data2[i])});
+    for (let i = 0; i < data1.length; i++) {
+        arr.push({ longitude: parseFloat(data1[i]), latitude: parseFloat(data2[i]) });
     }
     return arr;
 }
@@ -798,7 +790,7 @@ export function bytesToSize(bytes) {
 
     var k = 1024;
 
-    sizes = ['B','KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     i = Math.floor(Math.log(bytes) / Math.log(k));
 
@@ -811,27 +803,27 @@ export function bytesToSize(bytes) {
  *返回
  *如果时间小于现在的时间 返回 false，反之true
  */
-export function dateContrast(y,m,d,s,f,n){
-    if(y < n[0]){
+export function dateContrast(y, m, d, s, f, n) {
+    if (y < n[0]) {
         return false;
     }
-    if(y > n[0]){return true}
-    if(m < n[1]){
+    if (y > n[0]) { return true }
+    if (m < n[1]) {
         return false;
     }
-    if(m > n[1]){return true}
-    if(d < n[2]){
+    if (m > n[1]) { return true }
+    if (d < n[2]) {
         return false;
     }
-    if(d > n[2]){return true}
-    if(s < n[3]){
+    if (d > n[2]) { return true }
+    if (s < n[3]) {
         return false;
     }
-    if(s > n[3]){return true}
-    if(f <= n[4]){
+    if (s > n[3]) { return true }
+    if (f <= n[4]) {
         return false;
     }
-    if(f > n[4]){return true}
+    if (f > n[4]) { return true }
 }
 /**
  * gps 转高德系坐标
@@ -840,9 +832,9 @@ export function dateContrast(y,m,d,s,f,n){
  *{lon:'',lat:''}
  */
 export const GPSChange = {
-    PI : 3.14159265358979324,
-    x_pi : 3.14159265358979324 * 3000.0 / 180.0,
-    delta : function (lat, lon) {
+    PI: 3.14159265358979324,
+    x_pi: 3.14159265358979324 * 3000.0 / 180.0,
+    delta: function (lat, lon) {
         // Krasovsky 1940
         //
         // a = 6378245.0, 1/f = 298.3
@@ -858,10 +850,10 @@ export const GPSChange = {
         var sqrtMagic = Math.sqrt(magic);
         dLat = (dLat * 180.0) / ((a * (1 - ee)) / (magic * sqrtMagic) * this.PI);
         dLon = (dLon * 180.0) / (a / sqrtMagic * Math.cos(radLat) * this.PI);
-        return {'lat': dLat, 'lon': dLon};
+        return { 'lat': dLat, 'lon': dLon };
     },
     //GCJ-02 to WGS-84 exactly
-    gcj_decrypt_exact : function (gcjLat, gcjLon) {
+    gcj_decrypt_exact: function (gcjLat, gcjLon) {
         var initDelta = 0.01;
         var threshold = 0.000000001;
         var dLat = initDelta, dLon = initDelta;
@@ -883,31 +875,31 @@ export const GPSChange = {
             if (++i > 10000) break;
         }
         //console.log(i);
-        return {'lat': wgsLat, 'lon': wgsLon};
+        return { 'lat': wgsLat, 'lon': wgsLon };
     },
     //GPS---高德  WGS-84 to GCJ-02
-    gcj_encrypt : function ( wgsLat , wgsLon ) {
+    gcj_encrypt: function (wgsLat, wgsLon) {
         if (this.outOfChina(wgsLat, wgsLon))
-            return {'lat': wgsLat, 'lon': wgsLon};
+            return { 'lat': wgsLat, 'lon': wgsLon };
 
         var d = this.delta(wgsLat, wgsLon);
-        return {'lat' : wgsLat + d.lat,'lon' : wgsLon + d.lon};
+        return { 'lat': wgsLat + d.lat, 'lon': wgsLon + d.lon };
     },
-    outOfChina : function (lat, lon) {
+    outOfChina: function (lat, lon) {
         if (lon < 72.004 || lon > 137.8347)
             return true;
         if (lat < 0.8293 || lat > 55.8271)
             return true;
         return false;
     },
-    transformLat : function (x, y) {
+    transformLat: function (x, y) {
         var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
         ret += (20.0 * Math.sin(6.0 * x * this.PI) + 20.0 * Math.sin(2.0 * x * this.PI)) * 2.0 / 3.0;
         ret += (20.0 * Math.sin(y * this.PI) + 40.0 * Math.sin(y / 3.0 * this.PI)) * 2.0 / 3.0;
         ret += (160.0 * Math.sin(y / 12.0 * this.PI) + 320 * Math.sin(y * this.PI / 30.0)) * 2.0 / 3.0;
         return ret;
     },
-    transformLon : function (x, y) {
+    transformLon: function (x, y) {
         var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
         ret += (20.0 * Math.sin(6.0 * x * this.PI) + 20.0 * Math.sin(2.0 * x * this.PI)) * 2.0 / 3.0;
         ret += (20.0 * Math.sin(x * this.PI) + 40.0 * Math.sin(x / 3.0 * this.PI)) * 2.0 / 3.0;
@@ -966,7 +958,7 @@ export function IsPtInPoly(ALon, ALat, APoints) {
  */
 
 export function strTostamp(str) {
-    return Date.parse(new Date(str.replace(new RegExp(/-/gm) ,"/")))/1000;
+    return Date.parse(new Date(str.replace(new RegExp(/-/gm), "/"))) / 1000;
 }
 
 /**
@@ -979,7 +971,7 @@ export function strTostamp(str) {
 export function getDisance(lat1, lng1, lat2, lng2) { //lat为纬度, lng为经度, 一定不要弄错
     var dis = 0;
     var radLat1 = lat1 * Math.PI / 180;
-    var radLat2 = lat2  * Math.PI / 180;
+    var radLat2 = lat2 * Math.PI / 180;
     var deltaLat = radLat1 - radLat2;
     var deltaLng = lng1 * Math.PI / 180 - lng2 * Math.PI / 180;
     var dis = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2)));
@@ -992,10 +984,10 @@ export function getDisance(lat1, lng1, lat2, lng2) { //lat为纬度, lng为经�
  *返回
  *字符串
  */
-export function changestring(str){
-    if(str.indexOf('_') > 0){
+export function changestring(str) {
+    if (str.indexOf('_') > 0) {
         return str.replace(/_/g, '-');
-    }else{
+    } else {
         return str;
     }
 }
@@ -1006,9 +998,9 @@ export function changestring(str){
  *返回
  *true false
  */
-export function strInArr(str,arr,params){
-    for(let i=0;i<arr.length;i++){
-        if(arr[i][params] == str){
+export function strInArr(str, arr, params) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i][params] == str) {
             return true;
         }
     }
@@ -1023,13 +1015,13 @@ export function strInArr(str,arr,params){
  * 数组 【地址，编码，电话，网址】
  * 数组 【楼栋编码，房屋编码】
  */
-export function roomsplit(val: string){
+export function roomsplit(val: string) {
     let arr = [];
-    if(val.indexOf('4403') < 0){
+    if (val.indexOf('4403') < 0) {
         return arr;
     }
-    arr.push(val.substring(val.indexOf('4403'),val.indexOf('4403')+19));
-    arr.push(val.substring(val.indexOf('4403'),val.indexOf('4403')+25));
+    arr.push(val.substring(val.indexOf('4403'), val.indexOf('4403') + 19));
+    arr.push(val.substring(val.indexOf('4403'), val.indexOf('4403') + 25));
     // if(val.indexOf('房屋编码') < 1 && val.indexOf('联系电话') < 1 && val.indexOf('网上办事') < 1){
     //     return arr;
     // }
@@ -1046,12 +1038,12 @@ export function roomsplit(val: string){
  * @param {*} str 字符串
  * @param {*} parmas 中间切割字符
  */
-export function newImgSplit(str:string,parmas=","){
+export function newImgSplit(str: string, parmas = ",") {
     let arr = [];
-    if(str == null || str == ''){
+    if (str == null || str == '') {
         return arr;
     }
-    if(str.indexOf(parmas) < 0){
+    if (str.indexOf(parmas) < 0) {
         arr.push(str);
         return arr;
     }
@@ -1064,9 +1056,9 @@ export function newImgSplit(str:string,parmas=","){
  * 将对象里面的大写字母转换成小写
  * @param {*} obj 需要转换的对象
  */
-export function keyToLow(obj){
+export function keyToLow(obj) {
     let o = {};
-    Object.keys(obj).forEach(function(key){
+    Object.keys(obj).forEach(function (key) {
         o[key.toLowerCase()] = obj[key];
     });
 
@@ -1076,23 +1068,23 @@ export function keyToLow(obj){
  * 将对象中的数值转换成字符串
  * @param {*} obj
  */
-export function intToString(obj){
+export function intToString(obj) {
     for (let key in obj) {
         obj[key] = obj[key].toString();
     }
     return obj;
 }
 
- export function getUUID() {
-        var d = new Date().getTime();
-        if (window.performance && typeof window.performance.now === "function") {
-            d += performance.now(); //use high-precision timer if available
-        }
-        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = (d + Math.random() * 16) % 16 | 0;
-            d = Math.floor(d / 16);
-            return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-        });
-        // console.log('uuid: '+uuid);
-        return uuid;
+export function getUUID() {
+    var d = new Date().getTime();
+    if (window.performance && typeof window.performance.now === "function") {
+        d += performance.now(); //use high-precision timer if available
     }
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    // console.log('uuid: '+uuid);
+    return uuid;
+}

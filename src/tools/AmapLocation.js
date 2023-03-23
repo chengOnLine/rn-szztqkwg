@@ -103,32 +103,35 @@ export async function getLocation() {
                         code:0,
                         data:location
                     }
+                    resolve(obj);
 
-                    let latlng = res.data.longitude + ',' + res.data.latitude;
-                    latlngToaddress(latlng).then((loc) => {
-                        if (loc.status === "1") {
-                            let address = loc.regeocode.formatted_address
+                    //屏蔽地址解析功能，采用底层返回
+                    // let latlng = res.data.longitude + ',' + res.data.latitude;
+                    // latlngToaddress(latlng).then((loc) => {
+                    //     if (loc.status === "1") {
+                    //         let address = loc.regeocode.formatted_address
 
-                            let location = {
-                                coords: {
-                                    longitude: res.data.longitude,
-                                    latitude: res.data.latitude,
-                                    lonwgs84: wgs84.lon,
-                                    latwgs84: wgs84.lat,
-                                    speed: res.data.speed,
+                    //         let location = {
+                    //             coords: {
+                    //                 longitude: res.data.longitude,
+                    //                 latitude: res.data.latitude,
+                    //                 lonwgs84: wgs84.lon,
+                    //                 latwgs84: wgs84.lat,
+                    //                 speed: res.data.speed,
 
-                                    lng: wgs84.lon,
-                                    lat: wgs84.lat,
-                                },
-                                address: address,
-                            }
-                            obj = { code: 0, data: location }
-                        } else {
-                            obj = { code: 1, data: '失败' }
-                        }
-                        console.log('解析到定位信息：' + JSON.stringify(obj));
-                        resolve(obj);
-                    });
+                    //                 lng: wgs84.lon,
+                    //                 lat: wgs84.lat,
+                    //             },
+                    //             address: address,
+                    //         }
+                    //         obj = { code: 0, data: location }
+                    //     } else {
+                    //         obj = { code: 1, data: '失败' }
+                    //     }
+                    //     console.log('解析到定位信息：' + JSON.stringify(obj));
+
+                    //     resolve(obj);
+                    // });
                     
                 } else {
                     obj = { code: 1, data: '失败' }

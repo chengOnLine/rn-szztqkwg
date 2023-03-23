@@ -86,7 +86,7 @@ export default class LongBanManage extends Component {
     componentDidMount() {
 
         let pStreetName = '', pGridName = '';
-        if ((global.zltUser.info.princeArea != null && global.zltUser.info.princeArea.length == 1) || (global.zltUser.info.identity == 9 || global.zltUser.info.identity == 11)) {
+        if ((global.zltUser.info.princeArea != null) || (global.zltUser.info.identity == 9 || global.zltUser.info.identity == 11)) {
             let { streetId, communityId, gridId, streetName, communityName, gridName } = global.zltUser.info.princeArea[0];
             pStreetName = streetName; pGridName = gridName;
             this.state.pStreetName = pStreetName;
@@ -96,7 +96,7 @@ export default class LongBanManage extends Component {
             NativeModules.AMapLocationModule.generateToken().then(
                 (data) => {
 
-                    // alert(data.token)
+                    //  alert(data.token)
 
                     let secret = '7f63ff244577c2eb1716ef6685bedd8e';
                     let params = {
@@ -1302,7 +1302,7 @@ export default class LongBanManage extends Component {
                             }
 
                             <FlatList
-                                style={[this.state.idType == 2 ? CommonStyles.containerHeight360 : CommonStyles.containerHeight180, { marginBottom: scaleSize(30), backgroundColor: '#f3f3f3' }]}
+                                style={[this.state.idType == 2 ? CommonStyles.containerHeight360 : CommonStyles.containerHeight180, { marginBottom: scaleSize(380), backgroundColor: '#f3f3f3' }]}
                                 ref={(flatList) => this._flatList = flatList}
                                 ListFooterComponent={this._footer}
                                 ListHeaderComponent={this._header}

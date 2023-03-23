@@ -17,6 +17,7 @@ import SvgUri from 'react-native-svg-uri';
 import { Icons } from '../../fonts/fontIcons'
 import AlertContainer from '../Public/AlertContainer';
 import { HttpGet, HttpPost } from '../../request/index'
+import { Decrypt, versionContrast } from "../../tools/comm";
 
 import { scaleSize } from '../../tools/adaptation';//适配屏幕
 
@@ -54,7 +55,11 @@ export default class UpdateVersion extends Component {
                     let type = verdata.type == 0 ? true : false //类型 0-强制更新 1-提示升级
                     let updateUrl = verdata.fileinfo[0].url
 
-                    if (versionNumber != global.version.curNumber) {
+                    //versionContrast todo:此次对比版本号逻辑。
+                    //目前版本,最新版本
+                    let isver = versionContrast(global.version.curNumber.replace('V',''), versionNumber.replace('V',''));
+
+                    if (isver) {
                         this.setState({
                             alertShow: true,
                             isForce: type,
