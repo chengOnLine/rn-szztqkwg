@@ -62,6 +62,8 @@ export default class HomePage extends Component {
             tabList: [],
             data: [],
 
+            processTasksCount: 0,
+            formTasksCount: 0,
         };
     }
 
@@ -76,6 +78,7 @@ export default class HomePage extends Component {
 
             this.getMessage();
             this.getMessageCount();
+            this.getOneClickSearchCount();
         })
 
         this.unsubscribe = this.props.navigation.addListener('tabPress', e => {
@@ -84,6 +87,7 @@ export default class HomePage extends Component {
 
             this.getMessage();
             this.getMessageCount();
+            this.getOneClickSearchCount();
         });
 
 
@@ -98,6 +102,7 @@ export default class HomePage extends Component {
         this.getMessage();
         this.getMessageCount();
 
+        this.getOneClickSearchCount();
         storageGet("userInfo").then(res => {
             console.log(JSON.stringify(res))
         })
@@ -305,15 +310,12 @@ export default class HomePage extends Component {
     getMessage() {
         let params = {}
         HttpPost('qkwg-system/system/messageList/messageApp', params, 'json').then(res => {
-            if (res.flag) {
-                try {
-                    let data = res.data;
-                    let content = data.content.length > 18 ? data.content.substring(0, 18) + "..." : data.content;
-
-                    let msg = [{ createTime: data.createTime, content: content, businessName: data.businessName }];
-                    this.setState({ findMsgList: msg })
-
-                } catch (error) { }
+            const { flag , data } = res;
+            if (flag && data ) {
+                const { content , createTime , businessName } = data;
+                this.setState({ findMsgList: [{ createTime , content: content?.length > 18 ? content?.substring(0, 18) + "..." : content , businessName }] });
+            }else{
+                this.setState({ findMsgList: [] });
             }
         })
     }
@@ -325,6 +327,27 @@ export default class HomePage extends Component {
             if (res.flag) {
                 try {
                     this.setState({ myTaskCount: res.data.total })
+                } catch (error) { }
+            }
+        })
+
+    }
+
+    getOneClickSearchCount(){
+        // 流程任务
+        HttpPost('qkwg-flow/oneClickReportTask/listPage/todo', { pageNumber: 1, pageSize: 1 , taskType: 2 }, 'json').then(res => {
+            if (res.flag) {
+                try {
+                    this.setState({ processTasksCount: res.data.total })
+                } catch (error) { }
+            }
+        })
+
+        // 表单任务
+        HttpPost('qkwg-flow/oneClickReportTask/listPage/progress', { pageNumber: 1, pageSize: 1 , taskType: 1 }, 'json').then(res => {
+            if (res.flag) {
+                try {
+                    this.setState({ formTasksCount: res.data.total })
                 } catch (error) { }
             }
         })
@@ -410,7 +433,8 @@ export default class HomePage extends Component {
 
                     tabList.push({
                         id: item.id,
-                        name: title.length > 4 ? title.substring(0, 6) + '..' : title
+                        name: title.length > 4 ? title.substring(0, 6) + '..' : title,
+                        count: item.name === '一键报' ? this.state.processTasksCount + this.state.formTasksCount : undefined,
                     })
                 })
 
@@ -485,7 +509,6 @@ export default class HomePage extends Component {
 
                     // res.data.appRoleList=decryptKeyVal(appRoleList,mainKey);
                     res.data.user = decryptKeyVal(user, mainKey);
-                    // console.log(res);
 
                     let { communityId, communityName, deptId, deptName, email, fullName, gridId, gridName,
                         identity, password, phone, picAddress, princeArea, roleId, roleKey, roleName, sex,
@@ -592,7 +615,7 @@ export default class HomePage extends Component {
 
     //加载模式窗体-功能子菜单列表
     _renderMenu(props, menuType) {
-        //console.log(props);
+        // console.log("props" , props , menuType);
 
         props = props.item;
 
@@ -605,7 +628,7 @@ export default class HomePage extends Component {
         let imgsource = { uri: props.menuImageUrl };
         //outcode后端配置
         let outCode = props.outCode.toLowerCase(), h5Url = props.menuUrl;
-
+        let menuName = props.menuName;
         if (menuType == 'other') {
 
             return (
@@ -615,6 +638,24 @@ export default class HomePage extends Component {
                     style={[styCom.FlexBetween, styles.otherView]}
                     onPress={this._navOpen(menuType, id, outCode, h5Url, typeName)}
                 >
+                    {
+                         menuName === "流程任务" && this.state.processTasksCount > 0 ? <View style={{
+                            backgroundColor: '#f90e0e', paddingTop: scaleSize(2), paddingBottom: scaleSize(2),
+                            paddingLeft: scaleSize(5), paddingRight: scaleSize(10),
+                            borderRadius: scaleSize(20), position: 'absolute', top: -5, left: 20, zIndex: 15,
+                        }}>
+                            <Text style={{ color: '#fff', fontSize: scaleSize(20) }}> {this.state.processTasksCount > 99 ? '99+' : this.state.processTasksCount}</Text>
+                        </View> : null
+                    }
+                    {
+                         menuName === "表单任务" && this.state.formTasksCount > 0 ? <View style={{
+                            backgroundColor: '#f90e0e', paddingTop: scaleSize(2), paddingBottom: scaleSize(2),
+                            paddingLeft: scaleSize(5), paddingRight: scaleSize(10),
+                            borderRadius: scaleSize(20), position: 'absolute', top: -5, left: 20, zIndex: 15,
+                        }}>
+                            <Text style={{ color: '#fff', fontSize: scaleSize(20) }}> {this.state.formTasksCount > 99 ? '99+' : this.state.formTasksCount}</Text>
+                        </View> : null
+                    }
                     <View style={[styCom.FlexBetween,]}>
                         <Image source={imgsource} style={[styles.iconImgTop03,]} />
                         <Text style={styles.iconText}>{typeName}</Text>
@@ -658,10 +699,10 @@ export default class HomePage extends Component {
     _navOpen = (type, id, outCode, PageName, typeName) => () => {
 
         if (!this.state.isPermis) this.requestMultiplePermission();
-
+        let isShowSltUser;
         //跳转到H5的界面或者RN原生界面
         if (outCode != 'app') {
-            let isShowSltUser = true;
+            isShowSltUser = true;
 
             //参数加密
             let h5Url = PageName.indexOf('http') >= 0 ? PageName : global.H5Url + "?url=" + PageName;
@@ -891,7 +932,7 @@ export default class HomePage extends Component {
 
                                 <View style={styles.iconCom}>
                                     <View style={[styles.muenTitle, styles.borderBottom]}>
-                                        <Tabs status={this.state.activeId} tabList={this.state.tabList} tab={this._tabs.bind(this)} borderShow={false} />
+                                        <Tabs style={{ paddingTop: scaleSize(25) }} status={this.state.activeId} tabList={this.state.tabList} tab={this._tabs.bind(this)} borderShow={false} />
                                     </View>
 
                                     {this.laodAppMenuList(this.state.activeId, this.state.otherMuenList, 'other')}
@@ -1178,9 +1219,8 @@ const styles = StyleSheet.create({
         color: '#333',
         fontSize: scaleSize(28),
         paddingLeft: scaleSize(30),
-        paddingTop: scaleSize(40),
+        paddingTop: scaleSize(0),
         fontWeight: 'bold',
-
     },
 
 });

@@ -214,6 +214,7 @@ const router = [
     name: "LongBanManage",
     headerBgColor: '#FFF',
     headerFtColor: '#000',
+    headerShown: false,
     title: "楼栋长管理",
     component: require("../views/longBan/LongBanManage").default
   },

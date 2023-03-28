@@ -122,7 +122,7 @@ const styCom = StyleSheet.create({
     posAb:{
         position:'absolute',
     },
-
+    
 });
 
 export default styCom;

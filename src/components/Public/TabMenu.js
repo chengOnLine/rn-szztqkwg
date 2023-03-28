@@ -16,7 +16,7 @@ export default class Tabs extends Component {
 
     componentDidMount() {
         // console.log(Platform.OS);
-
+        
     }
 
     componentWillUnmount() {
@@ -48,6 +48,15 @@ export default class Tabs extends Component {
                                         this.props.borderShow === true && styles.border,
                                     ]}
                                 >
+                                   {
+                                        item.count !== undefined && item.count > 0 ? <View style={{
+                                            backgroundColor: 'rgba(255,0,0,0.8)', paddingTop: scaleSize(2), paddingBottom: scaleSize(2),
+                                            paddingLeft: scaleSize(5), paddingRight: scaleSize(10),
+                                            borderRadius: scaleSize(20), position: 'absolute', top: -5, right: -10, zIndex: 99999,
+                                        }}>
+                                            <Text style={{ color: '#fff', fontSize: scaleSize(20) }}> { item.count > 99 ? '99+' : item.count }</Text>
+                                        </View> : null
+                                    }
                                     <Text style={[styles.txt, this.props.status == item.id && styles.ActiveTxt]}>
                                         {item.name}
                                         {

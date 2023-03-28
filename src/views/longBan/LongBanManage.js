@@ -12,7 +12,8 @@ import {
     FlatList,
 } from 'react-native';
 import Load from '../../components/Loading/Index';
-import CommonStyles from "../../styles";
+// import longBan from "../../styles";
+import longBan from "../../styles/longBan";
 import { deviceWidth, deviceHeight, scaleSize } from '../../tools/adaptation';
 import AlertContainer from '../../components/Public/AlertContainer';
 import { toastShort } from "../../tools/toastUtil";
@@ -23,7 +24,8 @@ import List from '../../components/Index/LongBanManageList';
 import Button from '../../components/Public/Button';
 import { Decrypt, addbase64, addMD5 } from "../../tools/comm";
 import FormTable from '../../components/Public/FormTable';
-
+import OldHead from "../../components/Public/OldHead";
+import Picker from 'react-native-picker';
 let n, load, back, self;
 let ITEM_HEIGHT = 100;
 let pageSize = 10;
@@ -42,6 +44,7 @@ export default class LongBanManage extends Component {
             alertShow: false,
             btnTxt: '搜索',
             title: '更多查询条件',
+            cancelTxt: '取消',
             searchType: 0,//搜索类型（0：外部搜索，1：更多搜索）
             searchForm: {
                 name: '',
@@ -65,8 +68,8 @@ export default class LongBanManage extends Component {
             streets: [],//街道
             communitys: [],//社区
             grids: [],//网格
-            // isMustSelect: global.zltUser.info.princeArea != null && global.zltUser.info.princeArea.length > 1,
-            isMustSelect: false,
+            isMustSelect: global.zltUser.info.princeArea != null && global.zltUser.info.princeArea.length > 1,
+            // isMustSelect: false,
             pStreetName: '',
             pGridName: '',
             form: {
@@ -86,7 +89,8 @@ export default class LongBanManage extends Component {
     componentDidMount() {
 
         let pStreetName = '', pGridName = '';
-        if ((global.zltUser.info.princeArea != null) || (global.zltUser.info.identity == 9 || global.zltUser.info.identity == 11)) {
+        console.log("global.zltUser" , global.zltUser)
+        if ((global.zltUser.info.princeArea != null && global.zltUser.info.princeArea.length==1 ) || (global.zltUser.info.identity == 9 || global.zltUser.info.identity == 11)) {
             let { streetId, communityId, gridId, streetName, communityName, gridName } = global.zltUser.info.princeArea[0];
             pStreetName = streetName; pGridName = gridName;
             this.state.pStreetName = pStreetName;
@@ -114,7 +118,7 @@ export default class LongBanManage extends Component {
                     let base64Data = addbase64(paramStr);
                     let baseMd5 = addMD5(base64Data);
 
-                    post(url + '/ZLTCommon/APPLogin', {
+                    var p = {
                         // token:data.token,
                         // roleName:"网格员",
                         // streetName:"",
@@ -123,10 +127,23 @@ export default class LongBanManage extends Component {
 
                         token: data.token,
                         accToken: baseMd5,
-                        roleName: this.state.roleName,
-                        streetName: pStreetName == '' ? '光明区' : pStreetName,
-                        gridName: pGridName,
-                        userName: global.zltUser.info.userName,
+                       ...params
+                    }
+                    post(url + '/ZLTCommon/APPLogin', {
+                        // token:data.token,
+                        // roleName:"网格员",
+                        // streetName:"",
+                        // gridName:"光明01",
+                        // userName:"testxc2"
+
+                        // token: data.token,
+                        // accToken: baseMd5,
+                        // roleName: this.state.roleName,
+                        // streetName: pStreetName == '' ? '光明区' : pStreetName,
+                        // gridName: pGridName,
+                        // userName: global.zltUser.info.userName,
+
+                        ...p
                     }, null, function (res) {
                         self._loading(false);
                         if (res.error == '0') {
@@ -190,7 +207,7 @@ export default class LongBanManage extends Component {
             self._loading(true);
             let secret = '7f63ff244577c2eb1716ef6685bedd8e';
             let params = {
-                roleName: this.roleName,
+                roleName: this.state.roleName,
                 streetName: '光明区',
                 gridName: '',
                 userName: global.zltUser.info.userName,
@@ -210,7 +227,7 @@ export default class LongBanManage extends Component {
 
                         token: data.token,
                         accToken: baseMd5,
-                        roleName: this.roleName,
+                        roleName: this.state.roleName,
                         streetName: '光明区',
                         gridName: '',
                         userName: global.zltUser.info.userName,
@@ -548,6 +565,7 @@ export default class LongBanManage extends Component {
 
     // 获取数据
     _getList(type) {
+        console.log("_getList")
         if (type == '') {
             self._loading(true);
         }
@@ -596,7 +614,7 @@ export default class LongBanManage extends Component {
                 pageSize: pageSize
             };
         }
-
+        console.log("postData" , postData);
         post(url + '/ComLongBanInfo/GetLongbanInfoDataByPage', postData, null, function (res) {
             console.log(res);
             if (type == '') {
@@ -667,8 +685,8 @@ export default class LongBanManage extends Component {
     }
 
     _empty = () => {
-        return <View style={[CommonStyles.emptyContent]}>
-            <Text style={[CommonStyles.empty, { marginTop: scaleSize(20) }]}>暂无数据</Text>
+        return <View style={[longBan.emptyContent]}>
+            <Text style={[longBan.empty, { marginTop: scaleSize(20) }]}>暂无数据</Text>
         </View>;
     }
     _renderItem = ({ item }) => {
@@ -711,14 +729,14 @@ export default class LongBanManage extends Component {
         return null;
     }
     // _footer = () => {
-    //     return <View style={[CommonStyles.footerTip]}><Text style={CommonStyles.empty}>{this.state.data.length > pageSize ? '到底了~' : ''}</Text></View>;
+    //     return <View style={[longBan.footerTip]}><Text style={longBan.empty}>{this.state.data.length > pageSize ? '到底了~' : ''}</Text></View>;
     // }
     _footer = () => {
         if (!this.state.flatSHow || this.state.noArr) {
-            // return <View style={[CommonStyles.footerTip]}><Text style={CommonStyles.empty}>{this.state.data.length > pageSize ? '到底了~' : ''}</Text></View>;
-            return <View style={[CommonStyles.footerTip]}><Text style={CommonStyles.empty}>{this.state.data.length > pageSize ? '到底了~' : ''}</Text></View>;
+            // return <View style={[longBan.footerTip]}><Text style={longBan.empty}>{this.state.data.length > pageSize ? '到底了~' : ''}</Text></View>;
+            return <View style={[longBan.footerTip]}><Text style={longBan.empty}>{this.state.data.length > pageSize ? '到底了~' : ''}</Text></View>;
         } else {
-            return <View style={[CommonStyles.footerTip]}><Image source={require('../../assets/loading.gif')} style={{ width: scaleSize(36), height: scaleSize(36) }}></Image></View>;
+            return <View style={[longBan.footerTip]}><Image source={require('../../assets/loading.gif')} style={{ width: scaleSize(36), height: scaleSize(36) }}></Image></View>;
         }
     }
     _keyExtractor = (item, index) => index.toString();
@@ -801,8 +819,7 @@ export default class LongBanManage extends Component {
     }
 
     // 下拉选项
-    _selectPicker = (type) => () => {
-
+    _selectPicker = (type) => () => {   
             let d=new Date();
             let year=d.getFullYear(),month=d.getMonth()+1,date=d.getDate();
             let _this = this;
@@ -1126,10 +1143,10 @@ export default class LongBanManage extends Component {
 
         this.setState({ isMustSelect: false });
 
-        // self._loading(true);
+        self._loading(true);
         let secret = '7f63ff244577c2eb1716ef6685bedd8e';
         let params = {
-            roleName: this.roleName,
+            roleName: this.state.roleName,
             streetName: self.state.pStreetName == '' ? '光明区' : self.state.pStreetName,
             gridName: self.state.pGridName,
             userName: global.zltUser.info.userName,
@@ -1145,6 +1162,11 @@ export default class LongBanManage extends Component {
 
         NativeModules.AMapLocationModule.generateToken().then(
             (data) => {
+                const p = {
+                    token: data.token,
+                    accToken: baseMd5,
+                    ...params,
+                }
                 post(url + '/ZLTCommon/APPLogin', {
                     // token:data.token,
                     // roleName:"网格员",
@@ -1152,12 +1174,14 @@ export default class LongBanManage extends Component {
                     // gridName:"光明01",
                     // userName:"testxc2"
 
-                    token: data.token,
-                    accToken: baseMd5,
-                    roleName: this.roleName,
-                    streetName: self.state.pStreetName == '' ? '光明区' : self.state.pStreetName,
-                    gridName: self.state.pGridName,
-                    userName: global.zltUser.info.userName,
+                    // token: data.token,
+                    // accToken: baseMd5,
+                    // roleName: this.state.roleName,
+                    // streetName: self.state.pStreetName == '' ? '光明区' : self.state.pStreetName,
+                    // gridName: self.state.pGridName,
+                    // userName: global.zltUser.info.userName,
+
+                    ...p
                 }, null, function (res) {
                     self._loading(false);
                     if (res.error == '0') {
@@ -1192,41 +1216,49 @@ export default class LongBanManage extends Component {
         back = this.props.navigation.goBack;
         self = this;
         return (
-            <View style={CommonStyles.containerFull}>
-
+            <View style={longBan.containerFull}>
+                {
+                    global.zltUser.info.princeArea!=null && global.zltUser.info.princeArea.length>1 && !this.state.isMustSelect && !(global.zltUser.info.identity==9||global.zltUser.info.identity==11)
+                        ?
+                        <OldHead title='楼栋长列表' back={true} backAction={()=>this.props.navigation.goBack()} right={true} rightAction={()=>{this.setState({isMustSelect:true})}}>
+                            <Text style={{color:'#fff'}}>切换网格</Text>
+                        </OldHead>
+                        :
+                        <OldHead title='楼栋长列表' back={true} backAction={()=>this.props.navigation.goBack()} />
+                }
                 {
                     //&& !(global.zltUser.info.identity == 9 || global.zltUser.info.identity == 11) 
                     this.state.isMustSelect ?
-                        <View style={[CommonStyles.padT20, CommonStyles.resContent, { paddingBottom: scaleSize(160) }]}>
+                        <View style={[longBan.padT20, longBan.resContent, { paddingBottom: scaleSize(160) }]}>
                             <View style={[styles.title]}><Text style={[styles.lefttxtstyle, { fontSize: scaleSize(28), textAlign: 'left', color: '#ffa200' }]}>请选择</Text></View>
                             {/*<FormTable name={'街道'}>*/}
                             {/*<TouchableOpacity*/}
-                            {/*style={[CommonStyles.contentInputNoLeft]}*/}
+                            {/*style={[longBan.contentInputNoLeft]}*/}
                             {/*activeOpacity={1}*/}
                             {/*onPress={this._selectPicker('nstreet')}*/}
                             {/*>*/}
-                            {/*<Text style={[CommonStyles.Input,CommonStyles.fs24,CommonStyles.lineHeight48]}>{this.state.form.streetId==null?'请选择街道':this.state.form.streetName}</Text>*/}
-                            {/*<Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[CommonStyles.posAb,CommonStyles.arrowdown]}></Image>*/}
+                            {/*<Text style={[longBan.Input,longBan.fs24,longBan.lineHeight48]}>{this.state.form.streetId==null?'请选择街道':this.state.form.streetName}</Text>*/}
+                            {/*<Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[longBan.posAb,longBan.arrowdown]}></Image>*/}
                             {/*</TouchableOpacity>*/}
                             {/*</FormTable>*/}
                             {/*<FormTable name={'社区'}>*/}
                             {/*<TouchableOpacity*/}
-                            {/*style={[CommonStyles.contentInputNoLeft]}*/}
+                            {/*style={[longBan.contentInputNoLeft]}*/}
                             {/*activeOpacity={1}*/}
                             {/*onPress={this._selectPicker('ncommunity')}*/}
                             {/*>*/}
-                            {/*<Text style={[CommonStyles.Input,CommonStyles.fs24,CommonStyles.lineHeight48]}>{this.state.form.communityId==null?'请选择社区':this.state.form.communityName}</Text>*/}
-                            {/*<Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[CommonStyles.posAb,CommonStyles.arrowdown]}></Image>*/}
+                            {/*<Text style={[longBan.Input,longBan.fs24,longBan.lineHeight48]}>{this.state.form.communityId==null?'请选择社区':this.state.form.communityName}</Text>*/}
+                            {/*<Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[longBan.posAb,longBan.arrowdown]}></Image>*/}
                             {/*</TouchableOpacity>*/}
                             {/*</FormTable>*/}
                             <FormTable name={'网格'}>
                                 <TouchableOpacity
-                                    style={[CommonStyles.contentInputNoLeft]}
+                                    style={[longBan.contentInputNoLeft]}
                                     activeOpacity={1}
                                     onPress={this._selectPicker('ngrid')}
                                 >
-                                    <Text style={[CommonStyles.Input, CommonStyles.fs24, CommonStyles.lineHeight48]}>{this.state.form.gridName}</Text>
-                                    <Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[CommonStyles.posAb, CommonStyles.arrowdown]}></Image>
+                                    <Text style={[longBan.Input, longBan.fs24, longBan.lineHeight48]}>{this.state.form.gridName}</Text>
+                                    <Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[longBan.posAb, longBan.arrowdown]}></Image>
                                 </TouchableOpacity>
                             </FormTable>
 
@@ -1302,7 +1334,7 @@ export default class LongBanManage extends Component {
                             }
 
                             <FlatList
-                                style={[this.state.idType == 2 ? CommonStyles.containerHeight360 : CommonStyles.containerHeight180, { marginBottom: scaleSize(380), backgroundColor: '#f3f3f3' }]}
+                                style={[this.state.idType == 2 ? longBan.containerHeight360 : longBan.containerHeight180, { marginBottom: scaleSize(380), backgroundColor: '#f3f3f3' }]}
                                 ref={(flatList) => this._flatList = flatList}
                                 ListFooterComponent={this._footer}
                                 ListHeaderComponent={this._header}
@@ -1395,28 +1427,28 @@ export default class LongBanManage extends Component {
                                                 marginBottom: scaleSize(10),
                                             }}>
                                                 <TouchableOpacity
-                                                    style={[CommonStyles.contentInputNoLeft, { width: '33%', }]}
+                                                    style={[longBan.contentInputNoLeft, { width: '33%', }]}
                                                     activeOpacity={1}
                                                     onPress={this._selectPicker('street')}
                                                 >
-                                                    <Text style={[CommonStyles.Input, CommonStyles.fs24, CommonStyles.lineHeight48]}>{this.state.searchForm.streetName}</Text>
-                                                    <Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[CommonStyles.posAb, CommonStyles.arrowdown]}></Image>
+                                                    <Text style={[longBan.Input, longBan.fs24, longBan.lineHeight48]}>{this.state.searchForm.streetName}</Text>
+                                                    <Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[longBan.posAb, longBan.arrowdown]}></Image>
                                                 </TouchableOpacity>
                                                 <TouchableOpacity
-                                                    style={[CommonStyles.contentInputNoLeft, { width: '33%', }]}
+                                                    style={[longBan.contentInputNoLeft, { width: '33%', }]}
                                                     activeOpacity={1}
                                                     onPress={this._selectPicker('community')}
                                                 >
-                                                    <Text style={[CommonStyles.Input, CommonStyles.fs24, CommonStyles.lineHeight48]}>{this.state.searchForm.communityName}</Text>
-                                                    <Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[CommonStyles.posAb, CommonStyles.arrowdown]}></Image>
+                                                    <Text style={[longBan.Input, longBan.fs24, longBan.lineHeight48]}>{this.state.searchForm.communityName}</Text>
+                                                    <Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[longBan.posAb, longBan.arrowdown]}></Image>
                                                 </TouchableOpacity>
                                                 <TouchableOpacity
-                                                    style={[CommonStyles.contentInputNoLeft, { width: '33%', }]}
+                                                    style={[longBan.contentInputNoLeft, { width: '33%', }]}
                                                     activeOpacity={1}
                                                     onPress={this._selectPicker('grid')}
                                                 >
-                                                    <Text style={[CommonStyles.Input, CommonStyles.fs24, CommonStyles.lineHeight48]}>{this.state.searchForm.gridName}</Text>
-                                                    <Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[CommonStyles.posAb, CommonStyles.arrowdown]}></Image>
+                                                    <Text style={[longBan.Input, longBan.fs24, longBan.lineHeight48]}>{this.state.searchForm.gridName}</Text>
+                                                    <Image source={require('../../assets/arrowdown.png')} resizeMode="contain" style={[longBan.posAb, longBan.arrowdown]}></Image>
                                                 </TouchableOpacity>
                                             </View>
                                             <View style={{
