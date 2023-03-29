@@ -338,7 +338,9 @@ export default class HomePage extends Component {
         HttpPost('qkwg-flow/oneClickReportTask/listPage/todo', { pageNumber: 1, pageSize: 1 , taskType: 2 }, 'json').then(res => {
             if (res.flag) {
                 try {
-                    this.setState({ processTasksCount: res.data.total })
+                    this.setState({ processTasksCount: res.data.total } , () => {
+                        this.loadTypeMeunList(this.state.activeId);
+                    })
                 } catch (error) { }
             }
         })
@@ -347,11 +349,12 @@ export default class HomePage extends Component {
         HttpPost('qkwg-flow/oneClickReportTask/listPage/progress', { pageNumber: 1, pageSize: 1 , taskType: 1 }, 'json').then(res => {
             if (res.flag) {
                 try {
-                    this.setState({ formTasksCount: res.data.total })
+                    this.setState({ formTasksCount: res.data.total } , () => {
+                        this.loadTypeMeunList(this.state.activeId);
+                    })
                 } catch (error) { }
             }
         })
-
     }
 
     //加载首页菜单列表
@@ -403,7 +406,7 @@ export default class HomePage extends Component {
         })
     }
 
-    loadTypeMeunList() {
+    loadTypeMeunList(activeId) {
         //接口端约定对应ID的模块 头部4个菜单入口
         // 197129981511524352	巡查上报
         // 197130580873371648   所有事件
@@ -440,10 +443,10 @@ export default class HomePage extends Component {
 
                 this.setState({
                     tabList,
-                    activeId: tabList[0].id
+                    activeId: activeId || tabList[0].id
                 })
 
-                this._tabs(tabList[0].id)
+                this._tabs( activeId || tabList[0].id)
             }
 
         } catch (error) { }
@@ -559,7 +562,8 @@ export default class HomePage extends Component {
 
     //加对应的子菜单
     laodAppMenuList(pid, meunList, meunType) {
-
+        // console.log("meunList",meunList);
+        // console.log("meunType",meunType);
         if (meunList) {
             let curMeunList = [];
             meunList.forEach(item => {
@@ -697,7 +701,8 @@ export default class HomePage extends Component {
     }
 
     _navOpen = (type, id, outCode, PageName, typeName) => () => {
-
+        // console.log("outCode"  ,outCode);
+        // console.log("PageName"  ,PageName);
         if (!this.state.isPermis) this.requestMultiplePermission();
         let isShowSltUser;
         //跳转到H5的界面或者RN原生界面
