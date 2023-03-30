@@ -273,9 +273,14 @@ export default class HomePage extends Component {
         let bannerList = this.state.bannerList;
         if (bannerList.length > 0) {
             for (let i = 0; i < bannerList.length; i++) {
+                let url = "";
+                const { img } = bannerList[i];
+                if( img && img.length > 0 ){
+                  url = img[0].url;
+                }
                 itemArr.push(
                     <View style={styles.slide}>
-                        <Image style={[styles.imageStyle, { width: '100%' }]} resizeMode="cover" source={{ uri: bannerList[i].img[0].url }} />
+                        <Image style={[styles.imageStyle, { width: '100%' }]} resizeMode="cover" source={{ uri: url }} />
                     </View>
                 );
             }
