@@ -491,7 +491,7 @@ export default class HomePage extends Component {
 
             } else {
                 global.zlt_oauthToken = "";
-                toastShort("该用户没有权限登录3", 'bottom');
+                toastShort("该用户没有权限登录", 'bottom');
             }
         }).catch((error) => {
             toastShort(error, 'bottom');//超时会在这里
@@ -556,10 +556,10 @@ export default class HomePage extends Component {
                     global.navigation.navigate('LongBanManage');
 
                 } else {
-                    toastShort("该用户没有权限登录1", 'bottom');
+                    toastShort("该用户没有权限登录", 'bottom');
                 }
             } else {
-                toastShort("该用户没有权限登录2", 'bottom');
+                toastShort("该用户没有权限登录", 'bottom');
             }
         })
     }
