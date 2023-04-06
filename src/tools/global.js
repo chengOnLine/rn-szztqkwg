@@ -1,15 +1,16 @@
-global.requestApi ='https://mdajtest.szzt.com.cn/' //http://10.255.33.30:7050/;
+// global.requestApi ='http://10.255.33.30:7050/';
+global.requestApi ='http://10.143.10.67:8091/';
 
 //治理通请求url
-global.zlt_requestApi ='https://mdajtest.szzt.com.cn';
+global.zlt_requestApi ='http://10.143.10.67:8091';
 
-global.imageUrl = 'https://mdajtest.szzt.com.cn/upload/',
+// global.imageUrl = 'https://mdajtest.szzt.com.cn/upload/',
 
 global.requestHeadAuthorization = '';
 global.zlt_oauthToken=""
 
 global.version = {
-    curNumber: 'V2.0.39',
+    curNumber: 'V2.0.38',
     onLineDate: '2021-2-7',
     updateRemark: ['1、微服务改造；', '2、楼栋平安功能升级。']
 };
@@ -33,11 +34,12 @@ global.user = {
 
 
 global.zltVersion = {
-    curNumber: '2.0.32',
+    curNumber: '2.0.37',
 };
 
 global.zltUser={
     info: {},
+	
     oldUser:[],
     userName:''
 }
@@ -65,7 +67,7 @@ global.navigation = null;
 global.routeName = "";
 global.H5Title = "";
 
-global.H5Url="https://mdajtest.szzt.com.cn/zhwg-app-h5/index.html#/pages/auth/index";
+global.H5Url="http://10.143.10.67:8091/zhwg-app-h5/index.html#/pages/auth/index";
 
 //治理通h5
-global.zltH5Url="https://mdajtest.szzt.com.cn/zltH5/index.html#/auth";
+global.zltH5Url="http://10.143.10.67:8091/zltH5/index.html#/auth";
