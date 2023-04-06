@@ -638,6 +638,7 @@ export default class HomePage extends Component {
         //outcode后端配置
         let outCode = props.outCode.toLowerCase(), h5Url = props.menuUrl;
         let menuName = props.menuName;
+        let menuUrl = props.menuUrl;
         if (menuType == 'other') {
 
             return (
@@ -647,8 +648,9 @@ export default class HomePage extends Component {
                     style={[styCom.FlexBetween, styles.otherView]}
                     onPress={this._navOpen(menuType, id, outCode, h5Url, typeName)}
                 >
+                    {/* 流程任务 */}
                     {
-                         menuName === "流程任务" && this.state.processTasksCount > 0 ? <View style={{
+                         menuUrl === "/pages/subPages/dataManagement/aKeyReportDoing/index" && this.state.processTasksCount > 0 ? <View style={{
                             backgroundColor: '#f90e0e', paddingTop: scaleSize(2), paddingBottom: scaleSize(2),
                             paddingLeft: scaleSize(5), paddingRight: scaleSize(10),
                             borderRadius: scaleSize(20), position: 'absolute', top: -5, left: 20, zIndex: 15,
@@ -656,8 +658,9 @@ export default class HomePage extends Component {
                             <Text style={{ color: '#fff', fontSize: scaleSize(20) }}> {this.state.processTasksCount > 99 ? '99+' : this.state.processTasksCount}</Text>
                         </View> : null
                     }
+                    {/* 表单任务 */}
                     {
-                         menuName === "表单任务" && this.state.formTasksCount > 0 ? <View style={{
+                         menuUrl === "/pages/subPages/dataManagement/aKeyReportDone/index" ? <View style={{
                             backgroundColor: '#f90e0e', paddingTop: scaleSize(2), paddingBottom: scaleSize(2),
                             paddingLeft: scaleSize(5), paddingRight: scaleSize(10),
                             borderRadius: scaleSize(20), position: 'absolute', top: -5, left: 20, zIndex: 15,
