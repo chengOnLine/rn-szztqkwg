@@ -514,7 +514,7 @@ export default class Web extends Component {
                 <WebView
                     ref='webView'
                     // source={{ uri: 'file:///android_asset/test.html' }}
-                    // mixedContentMode={'always'}
+                    mixedContentMode={'always'}
                     source={{ uri: this.state.visiteUrl }}
                     scalesPageToFit={true}
                     startInLoadingState={true}

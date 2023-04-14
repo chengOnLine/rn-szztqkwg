@@ -114,6 +114,7 @@ const post = (url, params, headers, callback) => {
 
                 // console.log("token:" + global.zlt_oauthToken);
                 console.log("请求接口：" + url);
+                console.log("请求参数: " + JSON.stringify(fetchData))
                 // console.log("请求参数：" + JSON.stringify(params))
                 console.log("返回结果：" + JSON.stringify(responseJSON));
 
