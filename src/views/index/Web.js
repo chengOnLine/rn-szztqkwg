@@ -28,7 +28,7 @@ import { getLocation, getLocation2, getNowLocation } from "../../tools/AmapLocat
 import { post } from "../../request/NetUtility";
 import { HttpGet, HttpPost } from '../../request/index'
 import { decryptKeyVal } from '../../tools/comm'
-
+import clear from 'react-native-clear-app-cache';
 const patchPostMessageJsCode = `(function() {
     window.postMessage = function(data) {
         window.ReactNativeWebView.postMessage(data)
@@ -73,8 +73,9 @@ export default class Web extends Component {
 
             this.setState({
                 visiteUrl: self.state.h5Url + (self.state.h5Url.indexOf('?') >= 0 ? '&' : '?') + 'rand=' + Math.round(Math.random()*80)
+            } , () => {
+                console.log('h5-url: ' + self.state.visiteUrl)
             })
-            console.log('h5-url: ' + self.state.visiteUrl)
         }
 
         toastShort("正在加载中...", 'center');
@@ -245,6 +246,27 @@ export default class Web extends Component {
                 resultObj = { userInfo }
 
                 self.postMessageToH5(jsonObj, resultObj);
+            } else if (jsonObj.action == 'getCache'){ // 获取本地缓存数据大小
+                new Promise(( resolve , reject ) => {
+                    clear.getAppCacheSize((value, unit) => {
+                        resolve({ code: 0 ,  cacheSize: value , cacheUnit: unit });
+                    })
+                }).then( cache => {
+                    self.postMessageToH5(jsonObj , cache );
+                }).catch( () => {
+                    self.postMessageToH5(jsonObj , { code: 1 } );
+                })
+            } else if( jsonObj.action === 'clearCache'){ //清除本地缓存
+                console.log("a")
+                new Promise(( resolve , reject ) => {
+                    clear.clearAppCache(() => {
+                        resolve({ code: 0 , message: "清除成功"});
+                    }) 
+                }).then( response => {
+                    self.postMessageToH5(jsonObj , response );
+                }).catch( () => {
+                    self.postMessageToH5(jsonObj , { code: 1 , message: "清除失败" } );
+                })
             }
         } catch (error) {
         }
