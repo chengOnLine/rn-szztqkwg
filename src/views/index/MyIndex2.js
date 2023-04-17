@@ -21,7 +21,8 @@ import { toastShort } from '../../tools/toastUtil';
 import { Icons } from '../../fonts/fontIcons'
 import { HttpGet, HttpPost } from '../../request/index'
 import { storageDeleteItem } from '../../storage/index'
-
+import clear from 'react-native-clear-app-cache'
+import AlertContainer from '../../components/Public/AlertContainer';
 let self, n;
 export default class MyIndex2 extends Component {
   constructor(props) {
@@ -32,15 +33,17 @@ export default class MyIndex2 extends Component {
         userImg: 'https://mdajtest.szzt.com.cn/upload/image/20220428/1651117755943_eaba8c1e4a564fe6a4c3430bec05ab66.JPG',
         roleName: '',
         fullName: '',
+        cacheSize: 0,
+        cacheUnit: '',
       },
-
+      alertShow: false,
       version: '',
       msgCount: 0
     };
   }
   componentDidMount() {
 
-
+    this.updateCache();
     this.getPersonalInfo();
 
     this.getMessageCount();
@@ -54,7 +57,7 @@ export default class MyIndex2 extends Component {
 
 
     this.unsubscribe = this.props.navigation.addListener('tabPress', e => {
-
+      this.updateCache();
       this.getMessageCount();
 
       setTimeout(() => {
@@ -74,6 +77,16 @@ export default class MyIndex2 extends Component {
     this.unsubscribe();
   }
 
+  updateCache(){
+    clear.getAppCacheSize((value, unit) => {
+      console.log("缓存大小", value)
+      console.log("缓存单位", unit)
+      this.setState({
+        cacheSize: value,
+        cacheUnit: unit,
+      })
+    })
+  }
 
   getMessageCount() {
 
@@ -362,6 +375,59 @@ export default class MyIndex2 extends Component {
                 <View>
                   <SvgUri style={styles.rightIcon} svgXmlData={`<svg  viewBox="0 0 1024 1024"><path d="${Icons.moree}" fill="#C5C5C5"></path></svg>`} />
                 </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.userMeun}
+                onPress={() => { this.setState({ alertShow : true })  }}
+              >
+                <View style={styles.userMeunItem}>
+
+                  <Image style={styles.userMeunIcon} source={require('../../assets/myIndex/usIcon02.png')} />
+                  <Text style={styles.userMeunFont}>清除本地缓存</Text>
+                </View>
+
+                <View style={{ display: 'flex' , flexDirection: "row" , alignItems: 'center'}}>
+                  <Text style={[{ marginRight: scaleSize(10) }]}>{ this.state.cacheSize + this.state.cacheUnit }</Text>
+                  <SvgUri style={styles.rightIcon} svgXmlData={`<svg  viewBox="0 0 1024 1024"><path d="${Icons.moree}" fill="#C5C5C5"></path></svg>`} />
+                </View>
+                <AlertContainer
+                    alertShow={this.state.alertShow}
+                    iscolse={false}
+                    submit={
+                      () => {
+                        clear.clearAppCache(() => {
+                          this.setState({
+                            alertShow: false
+                          }, () => {
+                            this.updateCache();
+                          })
+                          toastShort("清除成功" , 'bottom');
+                        })
+                      }
+                    }
+                    close={
+                       () => {
+                        this.setState({
+                          alertShow: false,
+                        })
+                       }
+                    }
+                    reset={()=> {
+                      console.log("reset")
+                    }}
+                    title={'清除缓存'}
+                    btnTxt={'确认'}
+                    cancelTxt={'取消'}
+                    isOkShow={true}
+                    isCancelShow={true}
+                    style={{
+                        width: '90%',
+                    }}>
+
+                    <View style={{ marginBottom: scaleSize(30) }}>
+                        <Text>{'确认清除本地缓存？'}</Text>
+                    </View>
+                </AlertContainer>
               </TouchableOpacity>
 
             </View>
