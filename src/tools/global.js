@@ -9,7 +9,7 @@ global.requestHeadAuthorization = '';
 global.zlt_oauthToken=""
 
 global.version = {
-    curNumber: 'V2.0.39',
+    curNumber: 'V2.0.40',
     onLineDate: '2021-2-7',
     updateRemark: ['1、微服务改造；', '2、楼栋平安功能升级。']
 };

@@ -73,9 +73,8 @@ export default class Web extends Component {
 
             this.setState({
                 visiteUrl: self.state.h5Url + (self.state.h5Url.indexOf('?') >= 0 ? '&' : '?') + 'rand=' + Math.round(Math.random()*80)
-            } , () => {
-                console.log('h5-url: ' + self.state.visiteUrl)
             })
+            console.log('h5-url: ' + self.state.visiteUrl)
         }
 
         toastShort("正在加载中...", 'center');

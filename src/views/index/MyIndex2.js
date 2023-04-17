@@ -382,7 +382,7 @@ export default class MyIndex2 extends Component {
               >
                 <View style={styles.userMeunItem}>
 
-                  <Image style={styles.userMeunIcon} source={require('../../assets/myIndex/usIcon02.png')} />
+                  <Image style={styles.userMeunIcon} source={require('../../assets/myIndex/clear01.png')} />
                   <Text style={styles.userMeunFont}>清除本地缓存</Text>
                 </View>
 
